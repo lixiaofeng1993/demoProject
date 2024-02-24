@@ -1,0 +1,102 @@
+{% extends 'loginBase.html' %}
+{% load static %}
+
+{% block title %}
+    锁定
+{% endblock %}
+
+{% block welcome %}
+    锁定屏幕
+{% endblock %}
+
+{% block welcomeText %}
+    输入您的密码以解锁屏幕！
+{% endblock %}
+
+{% block body %}
+    <div class="user-thumb text-center mb-4 mt-4 pt-2">
+        <img src="{% static 'picture/user.jpg' %}"
+             class="rounded-circle img-thumbnail avatar-lg" alt="thumbnail">
+        <h5 class="font-size-15 mt-3">{{ user }}</h5>
+    </div>
+    <div class="custom-form mt-4 pt-2">
+        <div class="mb-3">
+            <label class="form-label" for="userpassword">密码</label>
+            <input type="password" class="form-control" id="password" placeholder="请输入密码" name="password">
+        </div>
+        <div class="mb-3 mt-4">
+            <button class="btn btn-primary w-100 waves-effect waves-light" type="button" onclick="UnlockFun();"
+                    id="unlock-btn">
+                解锁
+            </button>
+        </div>
+    </div>
+
+    <div class="mt-5 text-center">
+        <p class="text-muted mb-0">如果不是您？请重新
+            <a href="{% url 'login' %}" class="text-primary fw-semibold"> 登录 </a>
+        </p>
+    </div>
+    <div role="alert" id="alert"></div>
+{% endblock %}
+
+{% block js %}
+    <script>
+        let username = "{{ user }}";
+        let token = sessionStorage.getItem(username);
+        let prompt = $("#alert");
+        let passwordObj = $("#password");
+        passwordObj.focus();
+
+        passwordObj.bind('keyup', function (event) {
+            if (event.keyCode === 13) {
+                //回车执行
+                $('#unlock-btn').click();
+            }
+        });
+
+        function UnlockFun() {
+            let password = passwordObj.val();
+            if (!password) {
+                removeAlert(prompt).html("密码不能为空").addClass("alert-warning").show().delay(1500).fadeOut();
+                return
+            } else if (password.length < 6) {
+                removeAlert(prompt).html("密码不能小于6位").addClass("alert-warning").show().delay(1500).fadeOut();
+                return
+            }
+            let dataJson = JSON.stringify({
+                "password": password,
+            })
+            $.ajax({
+                type: "post",
+                url: "{% url 'lock' %}",
+                headers: {
+                    "Authorization": token
+                },
+                dataType: "json",
+                data: dataJson,
+                async: false,
+                success: function (result) {
+                    console.log(`lock ==>> ${result}`);
+                    let message = result.message;
+                    let code = result.code;
+                    if (code === 200) {
+                        removeAlert(prompt).html("解锁成功").addClass("alert-success").show().delay(1500).fadeOut();
+                        setTimeout(function () {
+                            top.location.href = "{% url 'index' %}";
+                        }, 1500);
+                    } else if (code === 100000) {
+                        removeAlert(prompt).html(message).addClass("alert-warning").show().delay(1500).fadeOut();
+                        setTimeout(function () {
+                            top.location.href = "{% url 'login' %}";
+                        }, 1500);
+                    } else {
+                        removeAlert(prompt).html(message).addClass("alert-warning").show().delay(1500).fadeOut();
+                    }
+                }, error: function () {
+                    removeAlert(prompt).html("出现未知异常，请联系Bruce.Li").addClass('alert-danger').show().delay(1500).fadeOut();
+                }
+            })
+        }
+    </script>
+{% endblock %}

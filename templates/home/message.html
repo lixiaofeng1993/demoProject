@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    消息通知
+{% endblock %}
+
+{% block body %}
+    <!-- start page title -->
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0 font-size-18">消息通知</h4>
+                <div class="page-title-right">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item"><a href="javascript:void(0);">系统</a></li>
+                        <li class="breadcrumb-item active">消息通知</li>
+                    </ol>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <!-- end page title -->
+
+    <div class="row">
+        <div class="col-xl-12">
+            <div class="card">
+
+            </div>
+            <!--页面数据-->
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead class="table-light">
+                        <tr>
+                            <th>#</th>
+                            <th>通知内容</th>
+                            <th>对象ID</th>
+                            <th>跳转页面</th>
+                            <th>是否已读</th>
+                            <th>创建时间</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% if object_list %}
+                            {% for object in object_list %}
+                                <tr>
+                                    <th scope="row">{{ forloop.counter|add:page_flag }}</th>
+                                    <td>{{ object.name|default:"--" }}</td>
+                                    <td>{{ object.obj_id|default:"--" }}</td>
+                                    <td>{{ object.type|default:"--" }}</td>
+                                    {% if object.is_look %}
+                                        <td style="color: #2ab57d;">已读</td>
+                                    {% else %}
+                                        <td style="color: #ffbf53;">未读</td>
+                                    {% endif %}
+                                    <td>{{ object.create_date|default:"--" }}</td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="8" style="text-align: center;font-size: 14px;">暂无数据</td>
+                            </tr>
+                        {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- end card body -->
+        </div>
+        <!-- end card -->
+    </div>
+    <!-- end col -->
+
+    <!--分页-->
+    {% if total_number > 0 %}
+        <ul class="pagination" style="">
+            {% if first %}
+                {% if search %}
+                    <li class="page"><a href="?search={{ search }}&page=1&size={{ size }}">1</a>
+                    </li>
+                {% else %}
+                    <li class="page"><a href="?page=1&size={{ size }}">1</a>
+                    </li>
+                {% endif %}
+            {% endif %}
+            {% if left %}
+                {% if left_has_more %}
+                    <li class="page"><a href="javascript:void(0)">...</a></li>
+                {% endif %}
+                {% for i in left %}
+                    {% if search %}
+                        <li class="page"><a
+                                href="?search={{ search }}&page={{ i }}&size={{ size }}">{{ i }}</a>
+                        </li>
+                    {% else %}
+                        <li class="page"><a href="?page={{ i }}&size={{ size }}">{{ i }}</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+            <li class="page"><a href="javascript:void(0)"
+                                class="active" id="page"> {{ page }}</a></li>
+            {% if right %}
+                {% for i in right %}
+                    {% if search %}
+                        <li class="page"><a
+                                href="?search={{ search }}&page={{ i }}&size={{ size }}">{{ i }}</a>
+                        </li>
+                    {% else %}
+                        <li class="page"><a href="?page={{ i }}&size={{ size }}">{{ i }}</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+                {% if right_has_more %}
+                    <li class="page"><a href="javascript:void(0)">...</a></li>
+                {% endif %}
+            {% endif %}
+            {% if last %}
+                {% if search %}
+                    <li class="page"><a
+                            href="?search={{ search }}&page={{ total_pages }}&size={{ size }}">{{ total_pages }}</a>
+                    </li>
+                {% else %}
+                    <li class="page"><a
+                            href="?page={{ total_pages }}&size={{ size }}">{{ total_pages }}</a>
+                    </li>
+                {% endif %}
+            {% endif %}
+            <li>
+                <select class="ui-select-pagesize" onchange="refreshSize();">
+                    {% if size == 5 %}
+                        <option value="5" selected>5条/页</option>
+                    {% else %}
+                        <option value="5">5条/页</option>
+                    {% endif %}
+                    {% if size == 10 %}
+                        <option value="10" selected>10条/页</option>
+                    {% else %}
+                        <option value="10">10条/页</option>
+                    {% endif %}
+                    {% if size == 15 %}
+                        <option value="15" selected>15条/页</option>
+                    {% else %}
+                        <option value="15">15条/页</option>
+                    {% endif %}
+                    {% if size == 20 %}
+                        <option value="20" selected>20条/页</option>
+                    {% else %}
+                        <option value="20">20条/页</option>
+                    {% endif %}
+                </select>
+            </li>
+        </ul>
+    {% endif %}
+{% endblock %}
+
+{% block js %}
+    <script>
+        function refreshSize() {
+            let size = $(".ui-select-pagesize").val();
+            setTimeout(function () {
+                top.location.href = `{% url 'nb:message_warn' %}?page=1&size=${size}`;
+            }, 500);
+        }
+    </script>
+{% endblock %}

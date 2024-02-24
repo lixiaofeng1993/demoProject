@@ -1,0 +1,140 @@
+{% extends 'loginBase.html' %}
+
+{% block title %}
+    登录
+{% endblock %}
+
+{% block welcome %}
+    欢迎回来！
+{% endblock %}
+
+{% block welcomeText %}
+    登录以继续访问 {{ siteName }}.
+{% endblock %}
+
+{% block body %}
+    <form class="custom-form mt-4 pt-2">
+        <div class="mb-3">
+            <label class="form-label">帐号</label>
+            <input type="text" class="form-control" id="username" name="username" placeholder="请输入帐号">
+        </div>
+        <div class="mb-3">
+            <div class="d-flex align-items-start">
+                <div class="flex-grow-1">
+                    <label class="form-label">密码</label>
+                </div>
+                <div class="flex-shrink-0">
+                    <div class="">
+                        <a href="javascript:void(0);" onclick="ForgetPwd();" class="text-muted">忘记密码?</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-group auth-pass-inputgroup">
+                <input type="password" class="form-control" placeholder="请输入密码" name="password" id="password"
+                       aria-label="Password" aria-describedby="password-addon">
+                <button class="btn btn-light shadow-none ms-0" type="button"
+                        id="password-addon"><i class="mdi mdi-eye-outline"></i></button>
+            </div>
+        </div>
+        <div class="row mb-4">
+
+        </div>
+        <div class="mb-3">
+            <button class="btn btn-primary w-100 waves-effect waves-light" type="button" id="login-btn"
+                    onclick="Login();">
+                登录
+            </button>
+        </div>
+    </form>
+    <div role="alert" id="alert"></div>
+{% endblock %}
+
+{% block js %}
+    <script>
+        let prompt = $("#alert");
+        let nameObj = $("#username");
+        let passwordObj = $("#password");
+        nameObj.focus();
+
+        nameObj.bind('keyup', function (event) {
+            if (event.keyCode === 13) {
+                //回车执行
+                $('#login-btn').click();
+            }
+        });
+        passwordObj.bind('keyup', function (event) {
+            if (event.keyCode === 13) {
+                //回车执行
+                $('#login-btn').click();
+            }
+        });
+
+        function ForgetPwd() {
+            let username = nameObj.val();
+            top.location.href = `{% url 'forget_pwd' %}?search=${username}`;
+        }
+
+        function Login() {
+            let username = nameObj.val();
+            let password = passwordObj.val();
+            if (!username || !password) {
+                removeAlert(prompt).html("用户名密码不能为空").addClass("alert-warning").show().delay(1500).fadeOut();
+                return
+            } else if (password.length < 6) {
+                removeAlert(prompt).html("密码不能小于6位").addClass("alert-warning").show().delay(1500).fadeOut();
+                return
+            }
+            let dataJson = JSON.stringify({
+                "username": username,
+                "password": password,
+            })
+            $.ajax({
+                type: "post",
+                url: "{% url 'login' %}",
+                dataType: "json",
+                data: dataJson,
+                async: false,
+                success: function (result) {
+                    console.log(`login ==>> ${result}`);
+                    let message = result.message;
+                    let code = result.code;
+                    if (code === 200) {
+                        let token = result.data.token;
+                        sessionStorage.setItem(username, token);
+                        removeAlert(prompt).html("登录成功").addClass("alert-success").show().delay(1500).fadeOut();
+                        setTimeout(function () {
+                            top.location.href = "{% url 'index' %}";
+                        }, 1500);
+                    } else {
+                        removeAlert(prompt).html(message).addClass("alert-warning").show().delay(1500).fadeOut();
+                    }
+                }, error: function () {
+                    removeAlert(prompt).html("出现未知异常，请联系Bruce.Li").addClass('alert-danger').show().delay(1500).fadeOut();
+                }
+            })
+        }
+
+        function UploadPoetry() {
+            $.ajax({
+                type: "post",
+                url: "{% url 'nb:upload_poetry' %}",
+                async: false,
+                success: function (result) {
+                    console.log(`nb:upload-poetry ==>> ${JSON.stringify(result)}`);
+                    let message = result.message;
+                    let code = result.code;
+                    if (code === 200) {
+
+                    } else {
+                        removeAlert(prompt).html(message).addClass("alert-warning").show().delay(1500).fadeOut();
+                    }
+                }, error: function () {
+                    removeAlert(prompt).html("出现未知异常，请联系Bruce.Li").addClass('alert-danger').show().delay(1500).fadeOut();
+                }
+            })
+        }
+
+        UploadPoetry();
+    </script>
+{% endblock %}

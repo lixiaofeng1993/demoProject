@@ -1,0 +1,122 @@
+{% extends 'loginBase.html' %}
+{% load static %}
+
+{% block title %}
+    密保
+{% endblock %}
+
+{% block welcome %}
+    密保问题
+{% endblock %}
+
+{% block welcomeText %}
+    回答密保问题，进行验证！
+{% endblock %}
+
+{% block body %}
+    <div class="custom-form mt-4 pt-2">
+        <div class="mb-3">
+            <label class="form-label" for="userpassword">帐号</label>
+            <input type="text" class="form-control" id="username" placeholder="请输入帐号" value="{{ search }}">
+        </div>
+        <div class="mb-3">
+            <label class="form-label" for="answer" id="problem"></label>
+            <input type="text" class="form-control" placeholder="请回答密保问题" id="answer">
+        </div>
+        <div class="mb-3 mt-4">
+            <button class="btn btn-primary w-100 waves-effect waves-light" type="button" onclick="SecurityVerify();"
+                    id="security-btn">
+                确认
+            </button>
+        </div>
+    </div>
+
+    <div class="mt-5 text-center">
+        <p class="text-muted mb-0">您还记得密码？请返回
+            <a href="{% url 'login' %}" class="text-primary fw-semibold"> 登录 </a>
+        </p>
+    </div>
+    <div role="alert" id="alert"></div>
+{% endblock %}
+
+{% block js %}
+    <script>
+        let prompt = $("#alert");
+        let answer = "";
+        let usernameObj = document.getElementById("username");
+        let answerObj = $("#answer");
+        usernameObj.focus();
+
+        answerObj.bind('keyup', function (event) {
+            if (event.keyCode === 13) {
+                //回车执行
+                $('#security-btn').click();
+            }
+        });
+
+        function usernameVerify(value) {
+            if (!value) {
+                removeAlert(prompt).html("请输入修改的帐号").addClass("alert-warning").show().delay(1500).fadeOut();
+                return false;
+            } else {
+                return true;
+            }
+        }
+
+        usernameObj.addEventListener('blur', function () { // 添加失去焦点事件处理程序
+            let value = this.value; // 获取输入框的值
+            if (usernameVerify(value)) {
+                GetSecurity();
+            }
+        });
+
+        function SecurityVerify() {
+            let answerText = answerObj.val();
+            let username = $("#username").val();
+            if (answerText === answer) {
+                removeAlert(prompt).html("验证成功").addClass("alert-success").show().delay(1500).fadeOut();
+                setTimeout(function () {
+                    top.location.href = `{% url 'rest_password' %}?search=${username}`;
+                }, 1500);
+            } else {
+                removeAlert(prompt).html("验证失败，请重新输入").addClass("alert-warning").show().delay(1500).fadeOut();
+            }
+        }
+
+        function GetSecurity() {
+            let username = $("#username").val();
+            let dataJson = JSON.stringify({
+                "username": username,
+            });
+            $.ajax({
+                type: "post",
+                url: `{% url 'forget_pwd' %}`,
+                dataType: "json",
+                data: dataJson,
+                async: false,
+                success: function (result) {
+                    console.log("forget-pwd==>>", result);
+                    let code = result.code;
+                    let message = result.message;
+                    let data = result.data;
+                    if (code === 200) {
+                        $("#problem").text(data.problem);
+                        answer = data.answer;
+                    } else if (code === 100011) {
+                        if (!username) {
+                            removeAlert(prompt).html("请输入修改的帐号").addClass("alert-warning").show().delay(1500).fadeOut();
+                        } else {
+                            removeAlert(prompt).html(message).addClass("alert-warning").show().delay(1500).fadeOut();
+                        }
+                    } else {
+                        removeAlert(prompt).html(message).addClass("alert-warning").show().delay(1500).fadeOut();
+                    }
+                }, error: function () {
+                    removeAlert(prompt).html("出现未知异常，请联系Bruce.Li").addClass('alert-danger').show().delay(1500).fadeOut();
+                }
+            })
+        }
+
+        GetSecurity();
+    </script>
+{% endblock %}

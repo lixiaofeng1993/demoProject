@@ -1,0 +1,638 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>
+        {% block title %}
+
+        {% endblock %}
+    </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta content="Premium Multipurpose Admin & Dashboard Template" name="description">
+    <meta content="Themesbrand" name="author">
+    <!--网站图标-->
+    <link href="{% static 'picture/favicon.ico' %}" rel="icon">
+    <!-- plugin css -->
+    <link href="{% static 'css/jquery-jvectormap-1.2.2.css' %}" rel="stylesheet" type="text/css">
+    <!-- preloader css -->
+    <link rel="stylesheet" href="{% static 'css/preloader.min.css' %}" type="text/css">
+    <!-- Bootstrap Css -->
+    <link href="{% static 'css/bootstrap.min.css' %}" id="bootstrap-style" rel="stylesheet" type="text/css">
+    <!-- Icons Css -->
+    <link href="{% static 'css/icons.min.css' %}" rel="stylesheet" type="text/css">
+    <!-- App Css-->
+    <link href="{% static 'css/app.min.css' %}" id="app-style" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="{% static 'css/alert.css' %}" type="text/css" media="all"/>
+    {% block css %}
+
+    {% endblock %}
+</head>
+
+<body style="min-height: 100%;">
+<!--加载页面空白样式-->
+<div id="loading-animation"></div>
+
+<!-- 页面开始 -->
+<div id="layout-wrapper">
+    <header id="page-topbar">
+        <div class="navbar-header">
+            <div class="d-flex">
+                <!-- 网站LOGO -->
+                <div class="navbar-brand-box">
+                    <a href="{% url 'index' %}" class="logo logo-dark">
+                                <span class="logo-sm">
+                                    <img src="{% static 'picture/logo.png' %}" alt="" height="24">
+                                </span>
+                        <span class="logo-lg">
+                                    <img src="{% static 'picture/logo.png' %}" alt="" height="24">
+                            <span class="logo-txt">{{ siteName }}</span>
+                        </span>
+                    </a>
+                    <a href="{% url 'index' %}" class="logo logo-light">
+                                <span class="logo-sm">
+                                    <img src="{% static 'picture/logo.png' %}" alt="" height="24">
+                                </span>
+                        <span class="logo-lg">
+                                    <img src="{% static 'picture/logo.png' %}" alt="" height="24">
+                            <span class="logo-txt">{{ siteName }}</span>
+                        </span>
+                    </a>
+                </div>
+                <!--切换导航按钮-->
+                <button type="button" class="btn btn-sm px-3 font-size-16 header-item" id="vertical-menu-btn">
+                    <i class="fa fa-fw fa-bars"></i>
+                </button>
+            </div>
+
+            <div class="d-flex">
+                <!--皮肤切换-->
+                <div class="">
+                    <button type="button" class="btn header-item" id="mode-setting-btn"
+                            style="font-size: 130%;margin-top: 5%"
+                            onclick="modifySubject(5, this.value);">
+
+                    </button>
+                </div>
+                <!--网站前置设置-->
+                <div class="dropdown d-none d-lg-inline-block ms-1">
+                    <button type="button" class="btn header-item" data-bs-toggle="dropdown" aria-haspopup="true"
+                            aria-expanded="false">
+                        <i data-feather="grid" class="icon-lg"></i>
+                        <!--<i class="fa fa-bars fa-lg" aria-hidden="true"></i>-->
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
+                        <div class="p-2">
+                            <div class="row g-0">
+                                <div class="col">
+                                    <a class="dropdown-icon-item" href="{% url 'nb:partners' %}">
+                                        <img src="{% static 'picture/partners.png' %}" alt="Github">
+                                        <span>业务伙伴</span>
+                                    </a>
+                                </div>
+                                <div class="col">
+                                    <a class="dropdown-icon-item" href="#">
+                                        <img src="{% static 'picture/user.jpg' %}" alt="Github">
+                                        <span>单位信息</span>
+                                    </a>
+                                </div>
+                                <div class="col">
+                                    <a class="dropdown-icon-item" href="#">
+                                        <img src="{% static 'picture/user.jpg' %}" alt="Github">
+                                        <span>单位信息</span>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="row g-0">
+                                <div class="col">
+                                    <a class="dropdown-icon-item" href="#">
+                                        <img src="{% static 'picture/user.jpg' %}" alt="Github">
+                                        <span>单位信息</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--站内消息提醒-->
+                <div class="dropdown d-inline-block">
+                    <button type="button" class="btn header-item noti-icon position-relative"
+                            id="page-header-notifications-dropdown" data-bs-toggle="dropdown" aria-haspopup="true"
+                            aria-expanded="false">
+                        <i data-feather="bell" class="icon-lg"></i>
+                        <span class="badge bg-danger rounded-pill" id="message-number"></span>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0"
+                         aria-labelledby="page-header-notifications-dropdown">
+                        <div class="p-3">
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    <h6 class="m-0"> 通知 </h6>
+                                </div>
+                                <div class="col-auto">
+                                    {#                                    <a href="#!" class="small text-reset text-decoration-underline"> Unread (3)</a>#}
+                                </div>
+                            </div>
+                        </div>
+                        <div data-simplebar="" style="max-height: 230px;" id="message-div">
+
+                        </div>
+                        <div class="p-2 border-top d-grid">
+                            <a class="btn btn-sm btn-link font-size-14 text-center" href="{% url 'nb:message_warn' %}">
+                                <i class="mdi mdi-arrow-right-circle me-1"></i> <span>查看更多</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <!--网站基本设置-->
+                <div class="dropdown d-inline-block">
+                    <button type="button" class="btn header-item right-bar-toggle me-2">
+                        <i data-feather="settings" class="icon-lg"></i>
+                    </button>
+                </div>
+                <!--用户相关-->
+                <div class="dropdown d-inline-block">
+                    <button type="button" class="btn header-item bg-soft-light border-start border-end"
+                            id="page-header-user-dropdown" data-bs-toggle="dropdown" aria-haspopup="true"
+                            aria-expanded="false">
+                        <img class="rounded-circle header-profile-user" src="{% static 'picture/user.jpg' %}"
+                             alt="Header Avatar">
+                        <span class="d-none d-xl-inline-block ms-1 fw-medium">{{ user }}</span>
+                        <i class="mdi mdi-chevron-down d-none d-xl-inline-block"></i>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-end">
+                        <!-- item-->
+                        <a class="dropdown-item" href="{% url 'modify_pwd' %}">
+                            <i class="mdi mdi-form-textbox-password font-size-16 align-middle me-1"></i> 修改密码</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="{% url 'lock' %}"><i
+                                class="mdi mdi-lock font-size-16 align-middle me-1"></i> 锁定屏幕</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="{% url 'logout' %}"><i
+                                class="mdi mdi-logout font-size-16 align-middle me-1"></i> 注销</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ==========左侧导航 ========== -->
+    <div class="vertical-menu">
+        <div data-simplebar="" class="h-100">
+            <!--- Sidemenu -->
+            <div id="sidebar-menu">
+                <!-- Left Menu Start -->
+                <ul class="metismenu list-unstyled" id="side-menu">
+                    <li class="menu-title" data-key="t-menu">导航</li>
+                    <li>
+                        <a href="{% url 'index' %}">
+                            <i data-feather="home"></i>
+                            <span data-key="t-dashboard">首页</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'nb:operate_log' %}">
+                            <i class="bx bx-video-recording"></i>
+                            <span data-key="t-goods">操作日志</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="javascript: void(0);" class="has-arrow">
+                            <i data-feather="grid"></i>
+                            <span data-key="t-apps">Apps</span>
+                        </a>
+                        <ul class="sub-menu" aria-expanded="false">
+                            <li>
+                                <a href="apps-calendar.html">
+                                    <span data-key="t-calendar">Calendar</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="javascript: void(0);" class="has-arrow">
+                                    <span data-key="t-email">Email</span>
+                                </a>
+                                <ul class="sub-menu" aria-expanded="false">
+                                    <li><a href="apps-email-inbox.html" data-key="t-inbox">Inbox</a></li>
+                                    <li><a href="apps-email-read.html" data-key="t-read-email">Read Email</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <!-- Sidebar -->
+        </div>
+    </div>
+    <!-- Left Sidebar End -->
+
+    <!-- ============================================================== -->
+    <!-- 页面内容 -->
+    <!-- ============================================================== -->
+    <div class="main-content">
+        <div class="page-content">
+            <div class="container-fluid">
+                {% block body %}
+
+                {% endblock %}
+            </div>
+        </div>
+        <!-- 网站信息备案 -->
+        <footer class="footer">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <script>document.write(new Date().getFullYear())</script>
+                        © {{ siteName }}.
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="text-sm-end d-none d-sm-block">
+                            Design & Develop by <a href="#!" class="text-decoration-underline">Bruce.li</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+</div>
+
+<!-- 基本设置弹窗 -->
+<div class="right-bar">
+    <div data-simplebar="" class="h-100">
+        <div class="rightbar-title d-flex align-items-center bg-dark p-3">
+            <h5 class="m-0 me-2 text-white">网站主题自定义</h5>
+            <a href="javascript:void(0);" class="right-bar-toggle ms-auto">
+                <i class="mdi mdi-close noti-icon"></i>
+            </a>
+        </div>
+        <!-- 设置选项 -->
+        <hr class="m-0">
+        <div class="p-4" id="subject-div">
+
+        </div>
+    </div>
+</div>
+<div role="alert" id="alert"></div>
+<!-- 导入js -->
+<script src="{% static 'js/jquery.min.js' %}"></script>
+<script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'js/metisMenu.min.js' %}"></script>
+<script src="{% static 'js/simplebar.min.js' %}"></script>
+<script src="{% static 'js/waves.min.js' %}"></script>
+<script src="{% static 'js/feather.min.js' %}"></script>
+<script src="{% static 'js/alert.js' %}"></script>
+<!-- pace js -->
+<script src="{% static 'js/pace.min.js' %}"></script>
+<!-- apexcharts -->
+<script src="{% static 'js/apexcharts.min.js' %}"></script>
+<!-- Plugins js-->
+<script src="{% static 'js/jquery-jvectormap-1.2.2.min.js' %}"></script>
+<script src="{% static 'js/jquery-jvectormap-world-mill-en.js' %}"></script>
+<!-- dashboard init -->
+<script src="{% static 'js/dashboard.init.js' %}"></script>
+<script src="{% static 'js/app.js' %}"></script>
+<script>
+    let username = "{{ user }}";
+    let token = sessionStorage.getItem(username);
+    let prompt = $("#alert");
+    <!--适配屏幕高度-->
+    let height = $(window).height();
+    document.getElementById("layout-wrapper").style.minHeight = `${height - 60}px`;
+
+    // 获取加载动画容器元素
+    var loadingAnimation = document.getElementById("loading-animation");
+
+    document.addEventListener("DOMContentLoaded", function () {
+        // 隐藏加载动画
+        loadingAnimation.style.display = "none";
+    });
+
+    function modifySubject(code, value) {
+        if (code === 5) {
+            let layoutIcon = $("#mode-setting-btn");
+            layoutIcon.html("");
+            if (value === "1") {
+                value = 2;
+                layoutIcon.append(`<i class="bx bx-sun"></i>`);
+            } else if (value === "2") {
+                value = 1;
+                layoutIcon.append(`<i class="bx bx-moon"></i>`);
+            }
+        }
+        let dataJson = JSON.stringify({"code": code, "value": value});
+        $.ajax({
+            type: "post",
+            url: `{% url 'nb:modify_subject' %}`,
+            headers: {
+                "Authorization": token
+            },
+            dataType: "json",
+            data: dataJson,
+            async: false,
+            success: function (result) {
+                console.log("modify_subject==>>", result);
+                let code = result.code;
+                let message = result.message;
+                if (code === 200) {
+                    location.reload();
+                } else if (code === 100000) {
+                    removeAlert(prompt).html(message).addClass("alert-warning").show().delay(1500).fadeOut();
+                    setTimeout(function () {
+                        top.location.href = "{% url 'login' %}";
+                    }, 1500);
+                } else {
+                    removeAlert(prompt).html(message).addClass("alert-warning").show().delay(1500).fadeOut();
+                }
+            }, error: function () {
+                removeAlert(prompt).html("出现未知异常，请联系Bruce.").addClass('alert-danger').show().delay(1500).fadeOut();
+            }
+        })
+    }
+
+    function Subject() {
+        $.ajax({
+            type: "post",
+            url: `{% url 'nb:subject' %}`,
+            headers: {
+                "Authorization": token,
+            },
+            async: false,
+            success: function (result) {
+                console.log("subject==>>", result);
+                let code = result.code;
+                let message = result.message;
+                if (code === 200) {
+                    let layout = result.data.layout;
+                    let data = JSON.parse(result.data.obj);
+                    let content = "";
+                    for (i = 0; i < data.length; i++) {
+                        if (data[i].fields.code === 1) {
+                            content += `<h6 class="mt-4 mb-3 pt-2">布局宽度</h6>`;
+                            if (data[i].fields.value === 1) {
+                                document.body.setAttribute('data-layout-size', 'fluid');
+                                content += `<div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="layout-width" id="layout-width-fuild" value="fuild" onchange="modifySubject(1, 1)" checked>
+                                            <label class="form-check-label" for="layout-width-fuild">自适应</label>
+                                        </div>
+                                           <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="layout-width" id="layout-width-boxed" value="boxed" onchange="modifySubject(1, 2)">
+                                            <label class="form-check-label" for="layout-width-boxed">居中</label>
+                                        </div>`
+                            } else if (data[i].fields.value === 2) {
+                                document.body.setAttribute('data-layout-size', 'boxed');
+                                content += `<div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="layout-width" id="layout-width-fuild" value="fuild"  onchange="modifySubject(1, 1)">
+                                            <label class="form-check-label" for="layout-width-fuild">自适应</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="layout-width" id="layout-width-boxed" value="boxed" onchange="modifySubject(1, 2)" checked>
+                                            <label class="form-check-label" for="layout-width-boxed">居中</label>
+                                        </div>`
+                            }
+                        } else if (data[i].fields.code === 2) {
+                            content += `<h6 class="mt-4 mb-3 pt-2">顶部颜色</h6>`;
+                            if (data[i].fields.value === 1) {
+                                if (layout.value !== 2) {
+                                    document.body.setAttribute('data-topbar', 'light');
+                                }
+                                content += `
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="topbar-color" id="topbar-color-light" value="light" onchange="modifySubject(2, 1)" checked>
+                                            <label class="form-check-label" for="topbar-color-light">明亮</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="topbar-color" id="topbar-color-dark" value="dark" onchange="modifySubject(2, 2)">
+                                            <label class="form-check-label" for="topbar-color-dark">黑暗</label>
+                                        </div>`
+                            } else if (data[i].fields.value === 2) {
+                                if (layout.value !== 2) {
+                                    document.body.setAttribute('data-topbar', 'dark');
+                                }
+                                content += `
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="topbar-color" id="topbar-color-light" value="light" onchange="modifySubject(2, 1)">
+                                            <label class="form-check-label" for="topbar-color-light">明亮</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="topbar-color" id="topbar-color-dark" value="dark" onchange="modifySubject(2, 2)" checked>
+                                            <label class="form-check-label" for="topbar-color-dark">黑暗</label>
+                                        </div>`
+                            }
+                        } else if (data[i].fields.code === 3) {
+                            content += `<h6 class="mt-4 mb-3 pt-2 sidebar-setting">导航大小</h6>`;
+                            if (data[i].fields.value === 1) {
+                                document.body.setAttribute('data-sidebar-size', 'lg')
+                                content += `<div class="form-check sidebar-setting">
+                                            <input class="form-check-input" type="radio" name="sidebar-size" id="sidebar-size-default" value="default" onchange="modifySubject(3, 1)" checked>
+                                            <label class="form-check-label" for="sidebar-size-default">默认</label>
+                                        </div>
+                                        <div class="form-check sidebar-setting">
+                                            <input class="form-check-input" type="radio" name="sidebar-size" id="sidebar-size-compact" value="compact" onchange="modifySubject(3, 2)">
+                                            <label class="form-check-label" for="sidebar-size-compact">紧凑</label>
+                                        </div>
+                                        <div class="form-check sidebar-setting">
+                                            <input class="form-check-input" type="radio" name="sidebar-size" id="sidebar-size-small" value="small" onchange="modifySubject(3, 3)">
+                                            <label class="form-check-label" for="sidebar-size-small">小巧</label>
+                                        </div>`
+                            } else if (data[i].fields.value === 2) {
+                                document.body.setAttribute('data-sidebar-size', 'md');
+                                content += `<div class="form-check sidebar-setting">
+                                            <input class="form-check-input" type="radio" name="sidebar-size" id="sidebar-size-default" value="default" onchange="modifySubject(3, 1)">
+                                            <label class="form-check-label" for="sidebar-size-default">默认</label>
+                                        </div>
+                                        <div class="form-check sidebar-setting">
+                                            <input class="form-check-input" type="radio" name="sidebar-size" id="sidebar-size-compact" value="compact" onchange="modifySubject(3, 2)" checked>
+                                            <label class="form-check-label" for="sidebar-size-compact">紧凑</label>
+                                        </div>
+                                        <div class="form-check sidebar-setting">
+                                            <input class="form-check-input" type="radio" name="sidebar-size" id="sidebar-size-small" value="small" onchange="modifySubject(3, 3)">
+                                            <label class="form-check-label" for="sidebar-size-small">小巧</label>
+                                        </div>`
+                            } else if (data[i].fields.value === 3) {
+                                document.body.setAttribute('data-sidebar-size', 'sm');
+                                content += `<div class="form-check sidebar-setting">
+                                            <input class="form-check-input" type="radio" name="sidebar-size" id="sidebar-size-default" value="default" onchange="modifySubject(3, 1)">
+                                            <label class="form-check-label" for="sidebar-size-default">默认</label>
+                                        </div>
+                                        <div class="form-check sidebar-setting">
+                                            <input class="form-check-input" type="radio" name="sidebar-size" id="sidebar-size-compact" value="compact" onchange="modifySubject(3, 2)">
+                                            <label class="form-check-label" for="sidebar-size-compact">紧凑</label>
+                                        </div>
+                                        <div class="form-check sidebar-setting">
+                                            <input class="form-check-input" type="radio" name="sidebar-size" id="sidebar-size-small" value="small" onchange="modifySubject(3, 3)" checked>
+                                            <label class="form-check-label" for="sidebar-size-small">小巧</label>
+                                        </div>`
+                            }
+                        } else if (data[i].fields.code === 4) {
+                            content += `<h6 class="mt-4 mb-3 pt-2 sidebar-setting">导航颜色</h6>`;
+                            if (data[i].fields.value === 1) {
+                                if (layout.value !== 2) {
+                                    document.body.setAttribute('data-sidebar', 'light');
+                                }
+                                content += `<div class="form-check sidebar-setting">
+                                            <input class="form-check-input" type="radio" name="sidebar-color" id="sidebar-color-light" value="light" onchange="modifySubject(4, 1)" checked>
+                                            <label class="form-check-label" for="sidebar-color-light">明亮</label>
+                                        </div>
+                                        <div class="form-check sidebar-setting">
+                                            <input class="form-check-input" type="radio" name="sidebar-color" id="sidebar-color-dark" value="dark" onchange="modifySubject(4, 2)">
+                                            <label class="form-check-label" for="sidebar-color-dark">黑暗</label>
+                                        </div>
+                                        <div class="form-check sidebar-setting">
+                                            <input class="form-check-input" type="radio" name="sidebar-color" id="sidebar-color-brand" value="brand" onchange="modifySubject(4, 3)">
+                                            <label class="form-check-label" for="sidebar-color-brand">经典</label>
+                                        </div>`
+                            } else if (data[i].fields.value === 2) {
+                                if (layout.value !== 2) {
+                                    document.body.setAttribute('data-sidebar', 'dark');
+                                }
+                                content += `<div class="form-check sidebar-setting">
+                                            <input class="form-check-input" type="radio" name="sidebar-color" id="sidebar-color-light" value="light" onchange="modifySubject(4, 1)">
+                                            <label class="form-check-label" for="sidebar-color-light">明亮</label>
+                                        </div>
+                                        <div class="form-check sidebar-setting">
+                                            <input class="form-check-input" type="radio" name="sidebar-color" id="sidebar-color-dark" value="dark" onchange="modifySubject(4, 2)" checked>
+                                            <label class="form-check-label" for="sidebar-color-dark">黑暗</label>
+                                        </div>
+                                        <div class="form-check sidebar-setting">
+                                            <input class="form-check-input" type="radio" name="sidebar-color" id="sidebar-color-brand" value="brand" onchange="modifySubject(4, 3)">
+                                            <label class="form-check-label" for="sidebar-color-brand">经典</label>
+                                        </div>`
+                            } else if (data[i].fields.value === 3) {
+                                if (layout.value !== 2) {
+                                    document.body.setAttribute('data-sidebar', 'brand');
+                                }
+                                content += `<div class="form-check sidebar-setting">
+                                            <input class="form-check-input" type="radio" name="sidebar-color" id="sidebar-color-light" value="light" onchange="modifySubject(4, 1)">
+                                            <label class="form-check-label" for="sidebar-color-light">明亮</label>
+                                        </div>
+                                        <div class="form-check sidebar-setting">
+                                            <input class="form-check-input" type="radio" name="sidebar-color" id="sidebar-color-dark" value="dark" onchange="modifySubject(4, 2)">
+                                            <label class="form-check-label" for="sidebar-color-dark">黑暗</label>
+                                        </div>
+                                        <div class="form-check sidebar-setting">
+                                            <input class="form-check-input" type="radio" name="sidebar-color" id="sidebar-color-brand" value="brand" onchange="modifySubject(4, 3)" checked>
+                                            <label class="form-check-label" for="sidebar-color-brand">经典</label>
+                                        </div>`
+                            }
+                        }
+                    }
+                    $("#subject-div").append(content);
+                } else if (code === 100000) {
+                    removeAlert(prompt).html(message).addClass("alert-warning").show().delay(1500).fadeOut();
+                    setTimeout(function () {
+                        top.location.href = "{% url 'login' %}";
+                    }, 1500);
+                } else {
+                    removeAlert(prompt).html(message).addClass("alert-warning").show().delay(1500).fadeOut();
+                }
+            },
+            error: function () {
+                removeAlert(prompt).html("出现未知异常，请联系Bruce.").addClass('alert-danger').show().delay(1500).fadeOut();
+            }
+        })
+    }
+
+    function Theme() {
+        $.ajax({
+            type: "post",
+            url: `{% url 'nb:theme' %}`,
+            headers: {
+                "Authorization": token,
+            },
+            async: false,
+            success: function (result) {
+                console.log("theme==>>", result);
+                let code = result.code;
+                let message = result.message;
+                if (code === 200) {
+                    let data = JSON.parse(result.data.obj);
+                    let layoutModel = "";
+                    let layoutIcon = $("#mode-setting-btn");
+                    if (data[0].fields.value === 1) {
+                        layoutModel = "light";
+                        layoutIcon.append(`<i class="bx bx-moon"></i>`)
+                    } else if (data[0].fields.value === 2) {
+                        layoutModel = "dark";
+                        layoutIcon.append(`<i class="bx bx-sun"></i>`);
+                    }
+                    layoutIcon.attr("value", data[0].fields.value);
+                    document.body.setAttribute('data-layout-mode', layoutModel);
+                    document.body.setAttribute('data-topbar', layoutModel);
+                    document.body.setAttribute('data-sidebar', layoutModel);
+                } else if (code === 100000) {
+                    removeAlert(prompt).html(message).addClass("alert-warning").show().delay(1500).fadeOut();
+                    setTimeout(function () {
+                        top.location.href = "{% url 'login' %}";
+                    }, 1500);
+                } else {
+                    removeAlert(prompt).html(message).addClass("alert-warning").show().delay(1500).fadeOut();
+                }
+            },
+            error: function () {
+                removeAlert(prompt).html("出现未知异常，请联系Bruce.").addClass('alert-danger').show().delay(1500).fadeOut();
+            }
+        })
+    }
+
+    function MessageWarn() {
+        $.ajax({
+            type: "post",
+            url: `{% url 'nb:message_home' %}`,
+            headers: {
+                "Authorization": token,
+            },
+            async: false,
+            success: function (result) {
+                console.log("message-warn==>>", result);
+                let code = result.code;
+                let message = result.message;
+                if (code === 200) {
+                    let content = "";
+                    let data = result.data;
+                    let number = data.number;
+                    let flag = data.flag;
+                    for (i = 0; i < data.data.length; i++) {
+                        content += `<a href="" class="text-reset notification-item">
+                                <div class="d-flex">
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-1">${data.data[i].name}</h6>
+                                        <div class="font-size-13 text-muted">
+                                            <p class="mb-0"><i class="mdi mdi-clock-outline"></i>
+                                                <span>${data.data[i].time}</span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>`
+                    }
+                    if (number > 99) {
+                        number = 99;
+                    }
+                    if (flag) {
+                        $("#message-number").text(number);
+                    }
+                    $("#message-div").append(content);
+                } else if (code === 100000) {
+                    removeAlert(prompt).html(message).addClass("alert-warning").show().delay(1500).fadeOut();
+                    setTimeout(function () {
+                        top.location.href = "{% url 'login' %}";
+                    }, 1500);
+                } else {
+                    removeAlert(prompt).html(message).addClass("alert-warning").show().delay(1500).fadeOut();
+                }
+            },
+            error: function () {
+                removeAlert(prompt).html("出现未知异常，请联系Bruce.").addClass('alert-danger').show().delay(1500).fadeOut();
+            }
+        })
+    }
+
+    Theme();
+    Subject();
+    MessageWarn();
+</script>
+{% block js %}
+
+{% endblock %}
+</body>
+</html>

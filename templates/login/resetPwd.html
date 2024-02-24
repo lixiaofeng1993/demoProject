@@ -1,0 +1,146 @@
+{% extends 'loginBase.html' %}
+{% load static %}
+
+{% block title %}
+    重置
+{% endblock %}
+
+{% block welcome %}
+    重置密码
+{% endblock %}
+
+{% block welcomeText %}
+    输入新密码继续使用 {{ siteName }}.
+{% endblock %}
+
+{% block body %}
+    <div class="user-thumb text-center mb-4 mt-4 pt-2">
+        <img src="{% static 'picture/user.jpg' %}"
+             class="rounded-circle img-thumbnail avatar-lg" alt="thumbnail">
+        <h5 class="font-size-15 mt-3">{{ search }}</h5>
+    </div>
+    <div class="custom-form mt-4 pt-2">
+        <div class="mb-3">
+            <label class="form-label" for="userpassword">新密码</label>
+            <input type="password" class="form-control" id="new-password" placeholder="请输入新密码" name="password">
+        </div>
+        <div class="mb-3">
+            <label class="form-label" for="userpassword">确认密码</label>
+            <input type="password" class="form-control" id="confirm-password" placeholder="请输入确认密码"
+                   name="password">
+        </div>
+        <div class="mb-3 mt-4">
+            <button class="btn btn-primary w-100 waves-effect waves-light" type="button" onclick="RestFun();"
+                    id="rest-btn">
+                重置
+            </button>
+        </div>
+    </div>
+
+    <div class="mt-5 text-center">
+        <p class="text-muted mb-0">您还记得密码？请返回
+            <a href="{% url 'login' %}" class="text-primary fw-semibold"> 登录 </a>
+        </p>
+    </div>
+    <div role="alert" id="alert"></div>
+{% endblock %}
+
+{% block js %}
+    <script>
+        let prompt = $("#alert");
+        let newPasswordObj = document.getElementById("new-password");
+        let newObj = $("#new-password");
+        let confirmPasswordObj = document.getElementById("confirm-password");
+        let confirmObj = $("#confirm-password");
+        newPasswordObj.focus();
+
+        newObj.bind('keyup', function (event) {
+            if (event.keyCode === 13) {
+                //回车执行
+                $('#rest-btn').click();
+            }
+        });
+
+        confirmObj.bind('keyup', function (event) {
+            if (event.keyCode === 13) {
+                //回车执行
+                $('#rest-btn').click();
+            }
+        });
+
+        function newPasswordVerify(value) {
+            if (value.length < 6) {
+                removeAlert(prompt).html("新密码不能小于6位").addClass("alert-warning").show().delay(1500).fadeOut();
+                return false;
+            } else {
+                return true;
+            }
+        }
+
+        function confirmPasswordVerify(value) {
+            let newPassword = newObj.val();
+            if (value.length < 6) {
+                removeAlert(prompt).html("确认密码不能小于6位").addClass("alert-warning").show().delay(1500).fadeOut();
+                return false
+            } else if (newPassword !== value) {
+                removeAlert(prompt).html("新密码和确认密码不一致").addClass("alert-warning").show().delay(1500).fadeOut();
+                return false
+            } else {
+                return true;
+            }
+        }
+
+        newPasswordObj.addEventListener('blur', function () { // 添加失去焦点事件处理程序
+            let value = this.value; // 获取输入框的值
+            newPasswordVerify(value);
+        });
+
+        confirmPasswordObj.addEventListener('blur', function () { // 添加失去焦点事件处理程序
+            let value = this.value; // 获取输入框的值
+            confirmPasswordVerify(value);
+        });
+
+        function RestFun() {
+            let username = '{{ search }}';
+            let newPassword = newObj.val();
+            let confirmPassword = confirmObj.val();
+            if (!newPasswordVerify(newPassword)) {
+                return
+            } else if (!confirmPasswordVerify(confirmPassword)) {
+                return
+            }
+            let dataJson = JSON.stringify({
+                "username": username,
+                "newPassword": newPassword,
+                "confirmPassword": confirmPassword,
+            })
+            $.ajax({
+                type: "post",
+                url: "{% url 'rest_password' %}",
+                dataType: "json",
+                data: dataJson,
+                async: false,
+                success: function (result) {
+                    console.log(`rest-password ==>> ${result}`);
+                    let message = result.message;
+                    let code = result.code;
+                    if (code === 200) {
+                        removeAlert(prompt).html("重置密码成功").addClass("alert-success").show().delay(1500).fadeOut();
+                        setTimeout(function () {
+                            top.location.href = "{% url 'login' %}";
+                        }, 1500);
+                    } else if (code === 100011) {
+                        removeAlert(prompt).html("帐号不存在，请返回密保页面重新输入").addClass("alert-warning").show().delay(1500).fadeOut();
+                        setTimeout(function () {
+                            top.location.href = "{% url 'forget_pwd' %}?search={{ search }}";
+                        }, 1500);
+                    } else {
+                        removeAlert(prompt).html(message).addClass("alert-warning").show().delay(1500).fadeOut();
+                    }
+                }, error: function () {
+                    removeAlert(prompt).html("出现未知异常，请联系Bruce.Li").addClass('alert-danger').show().delay(1500).fadeOut();
+                }
+            })
+        }
+    </script>
+{% endblock %}

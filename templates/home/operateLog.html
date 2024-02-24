@@ -1,0 +1,264 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    操作日志
+{% endblock %}
+
+{% block body %}
+    <!-- start page title -->
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0 font-size-18">操作日志</h4>
+                <div class="page-title-right">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item"><a href="{% url 'index' %}">首页</a></li>
+                        <li class="breadcrumb-item active">操作日志</li>
+                    </ol>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <!-- end page title -->
+
+    <div class="row">
+        <div class="col-xl-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="pull-left">
+
+                    </div>
+                    <div class="pull-right">
+                        <!--查询-->
+                        <div class="app-search d-none d-lg-block" style="padding: 0 0 0 0;">
+                            <div class="position-relative">
+                                <select class="form-control" name="choices-single-default" id="query_name"
+                                        style="width: 225px;">
+                                    {% if actionMaKe %}
+                                        <option value="{{ search }}">{{ actionMaKe }}</option>
+                                        <option value="0"></option>
+                                    {% else %}
+                                        <option value="0"></option>
+                                    {% endif %}
+                                </select>
+                                <button class="btn btn-primary" type="button" onclick="QueryPartners();"
+                                        id="search-btn">
+                                    <i class="bx bx-search-alt align-middle"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--页面数据-->
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead class="table-light">
+                        <tr>
+                            <th>#</th>
+                            <th>操作对象</th>
+                            <th>对象ID</th>
+                            <th>操作动作</th>
+                            <th>操作详情</th>
+                            <th>操作时间</th>
+                            <th>操作用户</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% if object_list %}
+                            {% for object in object_list %}
+                                <tr>
+                                    <th scope="row">{{ forloop.counter|add:page_flag }}</th>
+                                    <td>{{ object.object_repr|default:"--" }}</td>
+                                    <td>{{ object.object_id|default:"--" }}</td>
+                                    <td>
+                                        {% if object.action_flag == 1 %}
+                                            新增
+                                        {% elif object.action_flag == 2 %}
+                                            编辑
+                                        {% elif object.action_flag == 3 %}
+                                            删除
+                                        {% elif object.action_flag == 5 %}
+                                            登陆
+                                        {% elif object.action_flag == 6 %}
+                                            注销
+                                        {% elif object.action_flag == 8 %}
+                                            密码
+                                        {% elif object.action_flag == 9 %}
+                                            状态
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ object.change_message|default:"--" }}</td>
+                                    <td>{{ object.action_time|default:"--" }}</td>
+                                    <td>{{ object.user.username|default:"--" }}</td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="8" style="text-align: center;font-size: 14px;">暂无数据</td>
+                            </tr>
+                        {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- end card body -->
+        </div>
+        <!-- end card -->
+    </div>
+    <!-- end col -->
+
+    <!--分页-->
+    {% if total_number > 0 %}
+        <ul class="pagination">
+            {% if first %}
+                {% if search %}
+                    <li class="page"><a href="?search={{ search }}&page=1&size={{ size }}">1</a>
+                    </li>
+                {% else %}
+                    <li class="page"><a href="?page=1&size={{ size }}">1</a>
+                    </li>
+                {% endif %}
+            {% endif %}
+            {% if left %}
+                {% if left_has_more %}
+                    <li class="page"><a href="javascript:void(0)">...</a></li>
+                {% endif %}
+                {% for i in left %}
+                    {% if search %}
+                        <li class="page"><a
+                                href="?search={{ search }}&page={{ i }}&size={{ size }}">{{ i }}</a>
+                        </li>
+                    {% else %}
+                        <li class="page"><a href="?page={{ i }}&size={{ size }}">{{ i }}</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+            <li class="page"><a href="javascript:void(0)"
+                                class="active" id="page"> {{ page }}</a></li>
+            {% if right %}
+                {% for i in right %}
+                    {% if search %}
+                        <li class="page"><a
+                                href="?search={{ search }}&page={{ i }}&size={{ size }}">{{ i }}</a>
+                        </li>
+                    {% else %}
+                        <li class="page"><a href="?page={{ i }}&size={{ size }}">{{ i }}</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+                {% if right_has_more %}
+                    <li class="page"><a href="javascript:void(0)">...</a></li>
+                {% endif %}
+            {% endif %}
+            {% if last %}
+                {% if search %}
+                    <li class="page"><a
+                            href="?search={{ search }}&page={{ total_pages }}&size={{ size }}">{{ total_pages }}</a>
+                    </li>
+                {% else %}
+                    <li class="page"><a
+                            href="?page={{ total_pages }}&size={{ size }}">{{ total_pages }}</a>
+                    </li>
+                {% endif %}
+            {% endif %}
+            <li>
+                <select class="ui-select-pagesize" onchange="refreshSize();">
+                    {% if size == 5 %}
+                        <option value="5" selected>5条/页</option>
+                    {% else %}
+                        <option value="5">5条/页</option>
+                    {% endif %}
+                    {% if size == 10 %}
+                        <option value="10" selected>10条/页</option>
+                    {% else %}
+                        <option value="10">10条/页</option>
+                    {% endif %}
+                    {% if size == 15 %}
+                        <option value="15" selected>15条/页</option>
+                    {% else %}
+                        <option value="15">15条/页</option>
+                    {% endif %}
+                    {% if size == 20 %}
+                        <option value="20" selected>20条/页</option>
+                    {% else %}
+                        <option value="20">20条/页</option>
+                    {% endif %}
+                </select>
+            </li>
+        </ul>
+    {% endif %}
+{% endblock %}
+
+{% block js %}
+    <script>
+        function refreshSize() {
+            let size = $(".ui-select-pagesize").val();
+            setTimeout(function () {
+                top.location.href = `{% url 'nb:operate_log' %}?page=1&size=${size}&search={{ search }}`;
+            }, 500);
+        }
+
+        function string_format(string) {
+            string = string.replace("+", "%2B");
+            // string = string.replace(" ", "%20");
+            // string = string.replace("/", "%2F");
+            // string = string.replace("?", "%3F");
+            // string = string.replace("%", "%25");
+            // string = string.replace("#", "%23");
+            // string = string.replace("&", "%26");
+            // string = string.replace("=", "%3D");
+            return string;
+        }
+
+        function QueryPartners() {
+            let search = $("#query_name").select().val();
+            search = string_format(search);
+            removeAlert(prompt).html("查询成功").addClass("alert-success").show().delay(1500).fadeOut();
+            setTimeout(function () {
+                top.location.href = `{% url 'nb:operate_log' %}?page={{ page }}&size={{ size }}&search=${search}`;
+            }, 1500);
+        }
+
+        function OperateAction() {
+            $.ajax({
+                type: "post",
+                url: `{% url 'nb:operate_action' %}`,
+                headers: {
+                    "Authorization": token,
+                },
+                async: false,
+                success: function (result) {
+                    console.log("operate-action==>>", result);
+                    let code = result.code;
+                    let message = result.message;
+                    let data = result.data;
+                    if (code === 200) {
+                        let queryObj = $("#query_name");
+                        let content = "";
+                        for (let key in data) {
+                            if (data.hasOwnProperty(key)) {
+                                content += `<option value="${key}">${data[key]}</option>`;
+                            }
+                        }
+                        queryObj.append(content);
+                    } else if (code === 100000) {
+                        removeAlert(prompt).html(message).addClass("alert-warning").show().delay(1500).fadeOut();
+                        setTimeout(function () {
+                            top.location.href = "{% url 'login' %}";
+                        }, 1500);
+                    } else {
+                        removeAlert(prompt).html(message).addClass("alert-warning").show().delay(1500).fadeOut();
+                    }
+                }, error: function () {
+                    removeAlert(prompt).html("出现未知异常，请联系Bruce.Li").addClass('alert-danger').show().delay(1500).fadeOut();
+                }
+            })
+        }
+
+        OperateAction();
+    </script>
+{% endblock %}

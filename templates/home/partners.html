@@ -1,0 +1,651 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+    业务伙伴
+{% endblock %}
+
+{% block body %}
+    <!-- start page title -->
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0 font-size-18">业务伙伴</h4>
+                <div class="page-title-right">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item"><a href="javascript: void(0);">基础信息</a></li>
+                        <li class="breadcrumb-item active">业务伙伴</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- end page title -->
+
+    <div class="row">
+        <div class="col-xl-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="pull-left">
+                        <!--新增-->
+                        <button type="button" class="btn btn-soft-primary waves-effect waves-light"
+                                onclick="openModal();">新增
+                        </button>
+                    </div>
+                    <div class="pull-right">
+                        <!--查询-->
+                        <div class="app-search d-none d-lg-block" style="padding: 0 0 0 0;">
+                            <div class="position-relative">
+                                <input type="text" class="form-control" placeholder="Search..." name="query_name"
+                                       value="{{ search }}" id="query_name">
+                                <button class="btn btn-primary" type="button" onclick="query_partners();"
+                                        id="search-btn">
+                                    <i class="bx bx-search-alt align-middle"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--页面数据-->
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table mb-0">
+                            <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>编码</th>
+                                <th>名称</th>
+                                <th>类型</th>
+                                <th>联系方式</th>
+                                <th>地址</th>
+                                <th>状态</th>
+                                <th>备注</th>
+                                <th>更新时间</th>
+                                <th>操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% if object_list %}
+                                {% for object in object_list %}
+                                    <tr>
+                                        <th scope="row">{{ forloop.counter|add:page_flag }}</th>
+                                        <td>{{ object.code|default:"--" }}</td>
+                                        <td>{{ object.name|default:"--" }}</td>
+                                        <td>
+                                            {% if object.type == 1 %}
+                                                供应商
+                                            {% elif object.type == 2 %}
+                                                客户
+                                            {% elif object.type == 3 %}
+                                                供应商 & 客户
+                                            {% else %}
+                                                --
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ object.telephone|default:"--" }}</td>
+                                        <td>{{ object.address|default:"--" }}</td>
+                                        {% if object.status %}
+                                            <td onclick="openPromptModal('{{ object.id }}', 2,{{ object.status }});"
+                                                style="color: #ffbf53;">
+                                                禁用
+                                            </td>
+                                        {% else %}
+                                            <td onclick="openPromptModal('{{ object.id }}', 2,{{ object.status }});"
+                                                style="color: #2ab57d;">
+                                                正常
+                                            </td>
+                                        {% endif %}
+                                        <td>{{ object.remark|default:"--" }}</td>
+                                        <td>{{ object.update_date|default:"--" }}</td>
+                                        <td>
+                                            <button type="button" class="btn btn-soft-info waves-effect waves-light"
+                                                    onclick="PartnersInfo('{{ object.id }}');">
+                                                编辑
+                                            </button>
+                                            <button type="button" class="btn btn-soft-danger waves-effect waves-light"
+                                                    onclick="openPromptModal('{{ object.id }}', 1);">
+                                                删除
+                                            </button>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="8" style="text-align: center;font-size: 14px;">暂无数据</td>
+                                </tr>
+                            {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- end card body -->
+            </div>
+            <!-- end card -->
+        </div>
+        <!-- end col -->
+    </div>
+    <!--分页-->
+    {% if total_number > 0 %}
+        <ul class="pagination">
+            {% if first %}
+                {% if search %}
+                    <li class="page"><a href="?search={{ search }}&page=1&size={{ size }}">1</a>
+                    </li>
+                {% else %}
+                    <li class="page"><a href="?page=1&size={{ size }}">1</a>
+                    </li>
+                {% endif %}
+            {% endif %}
+            {% if left %}
+                {% if left_has_more %}
+                    <li class="page"><a href="javascript:void(0)">...</a></li>
+                {% endif %}
+                {% for i in left %}
+                    {% if search %}
+                        <li class="page"><a
+                                href="?search={{ search }}&page={{ i }}&size={{ size }}">{{ i }}</a>
+                        </li>
+                    {% else %}
+                        <li class="page"><a href="?page={{ i }}&size={{ size }}">{{ i }}</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+            <li class="page"><a href="javascript:void(0)"
+                                class="active" id="page"> {{ page }}</a></li>
+            {% if right %}
+                {% for i in right %}
+                    {% if search %}
+                        <li class="page"><a
+                                href="?search={{ search }}&page={{ i }}&size={{ size }}">{{ i }}</a>
+                        </li>
+                    {% else %}
+                        <li class="page"><a href="?page={{ i }}&size={{ size }}">{{ i }}</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+                {% if right_has_more %}
+                    <li class="page"><a href="javascript:void(0)">...</a></li>
+                {% endif %}
+            {% endif %}
+            {% if last %}
+                {% if search %}
+                    <li class="page"><a
+                            href="?search={{ search }}&page={{ total_pages }}&size={{ size }}">{{ total_pages }}</a>
+                    </li>
+                {% else %}
+                    <li class="page"><a
+                            href="?page={{ total_pages }}&size={{ size }}">{{ total_pages }}</a>
+                    </li>
+                {% endif %}
+            {% endif %}
+            <li>
+                <select class="ui-select-pagesize" onchange="refreshSize();">
+                    {% if size == 5 %}
+                        <option value="5" selected>5条/页</option>
+                    {% else %}
+                        <option value="5">5条/页</option>
+                    {% endif %}
+                    {% if size == 10 %}
+                        <option value="10" selected>10条/页</option>
+                    {% else %}
+                        <option value="10">10条/页</option>
+                    {% endif %}
+                    {% if size == 15 %}
+                        <option value="15" selected>15条/页</option>
+                    {% else %}
+                        <option value="15">15条/页</option>
+                    {% endif %}
+                    {% if size == 20 %}
+                        <option value="20" selected>20条/页</option>
+                    {% else %}
+                        <option value="20">20条/页</option>
+                    {% endif %}
+                </select>
+            </li>
+        </ul>
+    {% endif %}
+
+    <!-- 新增修改弹窗 -->
+    <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false"
+         tabindex="-1" role="dialog" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel"></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input id="partners-id" value="" hidden>
+                    <div class="row mb-3" id="partners-code-div" style="display: none;">
+                        <label for="horizontal-firstname-input" class="col-sm-3 col-form-label">伙伴编码</label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" id="partners-code" disabled>
+                        </div>
+                    </div>
+                    <div class="row mb-3" id="partners-pinyin-code-div" style="display: none;">
+                        <label for="horizontal-firstname-input" class="col-sm-3 col-form-label">拼音编码</label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" id="partners-pinyin-code" disabled>
+                        </div>
+                    </div>
+                    <div class="row mb-3" id="partners-status-div" style="display: none;">
+                        <label for="horizontal-firstname-input" class="col-sm-3 col-form-label">伙伴状态</label>
+                        <div class="col-sm-9">
+                            <span id="partners-status"></span>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label for="horizontal-firstname-input" class="col-sm-3 col-form-label">伙伴名称</label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" id="partners-name">
+                            <div class="invalid" id="name-error" style="position: absolute;"></div>
+                        </div>
+                    </div>
+                    <div class="row mb-4">
+                        <label for="horizontal-firstname-input" class="col-sm-3 col-form-label">伙伴类型</label>
+                        <div class="col-sm-9">
+                            <select class="form-control" name="choices-single-default" id="partners-type">
+                                <option value="0"></option>
+                                <option value="1">供应商</option>
+                                <option value="2">客户</option>
+                                <option value="3">供应商 & 客户</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row mb-4">
+                        <label for="horizontal-firstname-input" class="col-sm-3 col-form-label">联系方式</label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" id="partners-telephone">
+                            <div class="invalid" id="telephone-error" style="position: absolute;"></div>
+                        </div>
+                    </div>
+                    <div class="row mb-4">
+                        <label for="horizontal-firstname-input" class="col-sm-3 col-form-label">地址</label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" id="partners-address">
+                            <div class="invalid" id="address-error" style="position: absolute;"></div>
+                        </div>
+                    </div>
+                    <div class="row mb-4">
+                        <label for="horizontal-firstname-input" class="col-sm-3 col-form-label">备注</label>
+                        <div class="col-sm-9">
+                            <textarea type="text" class="form-control" id="partners-remark"></textarea>
+                            <div class="invalid" id="remark-error" style="position: absolute;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">关闭</button>
+                    <button type="button" class="btn btn-primary" onclick="savePartners();" id="save-btn">
+                        保存
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--确认弹窗-->
+    <div class="modal fade" id="exampleModalCenter-prompt" data-bs-backdrop="static" data-bs-keyboard="false"
+         tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
+            <div class="modal-content">
+                <input name="object-id" value="" hidden>
+                <input name="object-type" value="" hidden>
+                <input name="object-make" value="" hidden>
+                <div class="prompt-header">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="prompt-text">
+                    <span id="prompt-title"></span>
+                </div>
+                <div class="prompt-footer">
+                    <button type="button" class="btn btn-soft-success waves-effect waves-light" onclick="ConfirmBtn();"
+                            data-bs-dismiss="modal">确认
+                    </button>
+                    <button type="button" class="btn btn-soft-link waves-effect" data-bs-dismiss="modal"
+                            style="margin-left: 15%;">取消
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--异常提示弹窗-->
+    <div role="alert" id="alert"></div>
+{% endblock %}
+
+{% block js %}
+    <script>
+        let nameObj = document.getElementById("partners-name"); // 获取输入框元素
+        let telephoneObj = document.getElementById("partners-telephone");
+        let addressObj = document.getElementById("partners-address");
+        let remarkObj = document.getElementById("partners-remark");
+
+        function nameVerify(value) {
+            let nameError = $("#name-error");
+            if (!value) {
+                nameError.html("伙伴名称不能为空");
+                return false;
+            } else if (value.length > 50) {
+                nameError.html("伙伴名称限制最多50个字符");
+                return false
+            } else {
+                nameError.html("");
+                return true;
+            }
+        }
+
+        function telephoneVerify(value) {
+            let telephoneError = $("#telephone-error");
+            if (value.length > 50) {
+                telephoneError.html("联系方式限制最多50个字符");
+                return false;
+            } else {
+                telephoneError.html("");
+                return true;
+            }
+        }
+
+        function addressVerify(value) {
+            let addressError = $("#address-error");
+            if (value.length > 100) {
+                addressError.html("地址限制最多100个字符");
+                return false;
+            } else {
+                addressError.html("");
+                return true;
+            }
+        }
+
+        function remarkVerify(value) {
+            let remarkError = $("#remark-error");
+            if (value.length > 200) {
+                remarkError.html("备注限制最多200个字符");
+                return false;
+            } else {
+                remarkError.html("");
+                return true;
+            }
+        }
+
+        nameObj.addEventListener('blur', function () { // 添加失去焦点事件处理程序
+            let value = this.value; // 获取输入框的值
+            nameVerify(value);
+        });
+
+        telephoneObj.addEventListener('blur', function () { // 添加失去焦点事件处理程序
+            let value = this.value; // 获取输入框的值
+            telephoneVerify(value);
+        });
+
+        addressObj.addEventListener('blur', function () { // 添加失去焦点事件处理程序
+            let value = this.value; // 获取输入框的值
+            addressVerify(value);
+        });
+
+        remarkObj.addEventListener('blur', function () { // 添加失去焦点事件处理程序
+            let value = this.value; // 获取输入框的值
+            remarkVerify(value);
+        });
+    </script>
+    <script>
+        let query_name_obj = $("input[name='query_name']");
+        query_name_obj.bind('keyup', function (event) {
+            if (event.keyCode === 13) {
+                //回车执行
+                $('#search-btn').click();
+            }
+        });
+
+        function refreshSize() {
+            let size = $(".ui-select-pagesize").val();
+            setTimeout(function () {
+                top.location.href = `{% url 'nb:partners' %}?page=1&size=${size}&search={{ search }}`;
+            }, 500);
+        }
+
+        function string_format(string) {
+            string = string.replace("+", "%2B");
+            // string = string.replace(" ", "%20");
+            // string = string.replace("/", "%2F");
+            // string = string.replace("?", "%3F");
+            // string = string.replace("%", "%25");
+            // string = string.replace("#", "%23");
+            // string = string.replace("&", "%26");
+            // string = string.replace("=", "%3D");
+            return string;
+        }
+
+        function query_partners() {
+            let search = query_name_obj.val();
+            search = string_format(search);
+            removeAlert(prompt).html("查询成功").addClass("alert-success").show().delay(1500).fadeOut();
+            setTimeout(function () {
+                top.location.href = `{% url 'nb:partners' %}?page={{ page }}&size={{ size }}&search=${search}`;
+            }, 1500);
+        }
+
+        function openModal() {
+            $("#staticBackdrop").modal("show");
+            $("#staticBackdropLabel").html("业务伙伴");
+            $("#partners-name").val(null);
+            $(`#partners-type option[value='0']`).prop("selected", true);
+            $("#partners-telephone").val(null);
+            $("#partners-address").val(null);
+            $("#partners-remark").val(null);
+            $("input[name='object-id']").val(null);
+            $("input[name='object-type']").val(null);
+            $("input[name='object-make']").val(null);
+        }
+
+        function openPromptModal(object_id, flag, make = false) {
+            $("#exampleModalCenter-prompt").modal("show");
+            let title = $("#prompt-title");
+            $("input[name='object-id']").val(object_id);
+            $("input[name='object-type']").val(flag);
+            $("input[name='object-make']").val(make);
+            if (flag === 1) {
+                title.html("确认要删除数据吗？");
+            } else if (flag === 2) {
+                title.html("确认要修改状态吗？");
+            }
+        }
+
+        function ConfirmBtn() {
+            setTimeout(function () {
+                let object_id = $("input[name='object-id']").val();
+                let object_type = $("input[name='object-type']").val();
+                let object_make = $("input[name='object-make']").val();
+                object_type = parseInt(object_type); // 转int
+                if (object_type === 1) {
+                    partners_del(object_id);
+                } else if (object_type === 2) {
+                    partners_status(object_id, object_make);
+                }
+            }, 500);
+        }
+
+        function partners_status(partners_id, object_make) {
+            let dataJson = JSON.stringify({
+                "status": object_make,
+            });
+            $.ajax({
+                type: "post",
+                url: `/nb/partners/status/${partners_id}/?page={{ page }}&size={{ size }}&search={{ search }}`,
+                headers: {
+                    "Authorization": token,
+                },
+                dataType: "json",
+                data: dataJson,
+                async: false,
+                success: function (result) {
+                    console.log("partners-status==>>", result);
+                    let code = result.code;
+                    let message = result.message;
+                    let data = result.data;
+                    if (code === 200) {
+                        removeAlert(prompt).html("修改状态成功").addClass("alert-success").show().delay(1500).fadeOut();
+                        setTimeout(function () {
+                            top.location.href = `{% url 'nb:partners' %}?page=${data.page}&size={{ size }}&search=${data.search}`;
+                        }, 1500);
+                    } else if (code === 100000) {
+                        removeAlert(prompt).html(message).addClass("alert-warning").show().delay(1500).fadeOut();
+                        setTimeout(function () {
+                            top.location.href = "{% url 'login' %}";
+                        }, 1500);
+                    } else {
+                        removeAlert(prompt).html(message).addClass("alert-warning").show().delay(1500).fadeOut();
+                    }
+                }, error: function () {
+                    removeAlert(prompt).html("出现未知异常，请联系Bruce.Li").addClass('alert-danger').show().delay(1500).fadeOut();
+                }
+            })
+        }
+
+        function partners_del(partners_id) {
+            $.ajax({
+                type: "post",
+                url: `/nb/partners/del/${partners_id}/?page={{ page }}&size={{ size }}&search={{ search }}`,
+                headers: {
+                    "Authorization": token,
+                },
+                async: false,
+                success: function (result) {
+                    console.log("partners-del==>>", result);
+                    let code = result.code;
+                    let message = result.message;
+                    let data = result.data;
+                    if (code === 200) {
+                        removeAlert(prompt).html("删除成功").addClass("alert-success").show().delay(1500).fadeOut();
+                        setTimeout(function () {
+                            top.location.href = `{% url 'nb:partners' %}?page=${data.page}&size={{ size }}&search=${data.search}`;
+                        }, 1500);
+                    } else if (code === 100000) {
+                        removeAlert(prompt).html(message).addClass("alert-warning").show().delay(1500).fadeOut();
+                        setTimeout(function () {
+                            top.location.href = "{% url 'login' %}";
+                        }, 1500);
+                    } else {
+                        removeAlert(prompt).html(message).addClass("alert-warning").show().delay(1500).fadeOut();
+                    }
+                }, error: function () {
+                    removeAlert(prompt).html("出现未知异常，请联系Bruce.Li").addClass('alert-danger').show().delay(1500).fadeOut();
+                }
+            })
+        }
+
+        function savePartners() {
+            let name = $("#partners-name").val();
+            let type = $("#partners-type").select().val();
+            let telephone = $("#partners-telephone").val();
+            let address = $("#partners-address").val();
+            let remark = $("#partners-remark").val();
+            let partners_id = $("#partners-id").val();
+            if (!nameVerify(name)) {
+                return
+            } else if (!telephoneVerify(telephone)) {
+                return
+            } else if (!addressVerify(address)) {
+                return
+            } else if (!remarkVerify(remark)) {
+                return
+            }
+            let dataJson = JSON.stringify({
+                "name": name,
+                "type": type,
+                "telephone": telephone,
+                "address": address,
+                "remark": remark,
+                "partners_id": partners_id,
+            });
+            $.ajax({
+                type: "post",
+                url: `{% url 'nb:partners_save' %}`,
+                headers: {
+                    "Authorization": token,
+                },
+                dataType: "json",
+                data: dataJson,
+                async: false,
+                success: function (result) {
+                    console.log("nb:partners-save==>>", result);
+                    let code = result.code;
+                    let message = result.message;
+                    if (code === 200) {
+                        $("#staticBackdrop").modal("hide");
+                        setTimeout(function () {
+                            removeAlert(prompt).html("保存成功").addClass("alert-success").show().delay(1500).fadeOut();
+                            setTimeout(function () {
+                                let page = "";
+                                if (partners_id) {
+                                    page = '{{ page }}';
+                                } else {
+                                    page = '1';
+                                }
+                                top.location.href = `{% url 'nb:partners' %}?page=${page}&size={{ size }}&search={{ search }}`;
+                            }, 1500);
+                        }, 500);
+                    } else if (code === 100000) {
+                        removeAlert(prompt).html(message).addClass("alert-warning").show().delay(1500).fadeOut();
+                        setTimeout(function () {
+                            top.location.href = "{% url 'login' %}";
+                        }, 1500);
+                    } else {
+                        removeAlert(prompt).html(message).addClass("alert-warning").show().delay(1500).fadeOut();
+                    }
+                },
+                error: function () {
+                    removeAlert(prompt).html("出现未知异常，请联系Bruce.Li").addClass('alert-danger').show().delay(1500).fadeOut();
+                }
+            })
+        }
+
+        function PartnersInfo(partners_id) {
+            $.ajax({
+                type: "post",
+                url: `/nb/partners/info/${partners_id}/?page={{ page }}&size={{ size }}&search={{ search }}`,
+                headers: {
+                    "Authorization": token,
+                },
+                async: false,
+                success: function (result) {
+                    console.log("partners-info==>>", result);
+                    let code = result.code;
+                    let message = result.message;
+                    if (code === 200) {
+                        let data = JSON.parse(result.data.obj);
+                        $("#staticBackdrop").modal("show");
+                        $("#staticBackdropLabel").html("业务伙伴");
+                        $("#partners-id").val(partners_id);
+                        $("#partners-code-div").show();
+                        $("#partners-code").val(data[0].fields.code);
+                        $("#partners-pinyin-code-div").show();
+                        $("#partners-pinyin-code").val(data[0].fields.pinyin_code);
+                        $("#partners-status-div").show();
+                        if (data[0].fields.status === 0) {
+                            $("#partners-status").text("正常");
+                            document.getElementById("partners-status").style.color = "#2ab57d";
+                        } else if (data[0].fields.status === 1) {
+                            $("#partners-status").text("禁用");
+                            document.getElementById("partners-status").style.color = "#ffbf53";
+                        }
+                        $("#partners-name").val(data[0].fields.name);
+                        $(`#partners-type option[value='${data[0].fields.type}']`).prop("selected", true);
+                        $("#partners-telephone").val(data[0].fields.telephone);
+                        $("#partners-address").val(data[0].fields.address);
+                        $("#partners-remark").val(data[0].fields.remark);
+                    } else if (code === 100000) {
+                        removeAlert(prompt).html(message).addClass("alert-warning").show().delay(1500).fadeOut();
+                        setTimeout(function () {
+                            top.location.href = "{% url 'login' %}";
+                        }, 1500);
+                    } else {
+                        removeAlert(prompt).html(message).addClass("alert-warning").show().delay(1500).fadeOut();
+                    }
+                }, error: function () {
+                    removeAlert(prompt).html(message).addClass("alert-danger").show().delay(1500).fadeOut();
+                }
+            })
+        }
+    </script>
+{% endblock %}

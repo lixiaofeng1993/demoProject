@@ -1,0 +1,20 @@
+{% extends 'loginBase.html' %}
+
+{% block title %}
+    注销
+{% endblock %}
+
+{% block welcome %}
+    您已注销
+{% endblock %}
+
+{% block welcomeText %}
+    感谢您使用 {{ siteName }}.
+{% endblock %}
+
+{% block body %}
+    <div class="mt-4">
+        <a href="{% url 'login' %}" class="btn btn-primary w-100 waves-effect waves-light">登录</a>
+    </div>
+    <div role="alert" id="alert"></div>
+{% endblock %}

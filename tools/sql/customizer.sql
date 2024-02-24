@@ -1,0 +1,5 @@
+INSERT INTO `customizer` (`id`, `name`, `code`, `zh_name`, `value`, `is_delete`, `update_date`, `remark`, `user_id`) VALUES ('6ba7b8109dad11d180b400c04fd430c1', 'Layout Width', 1, '布局宽度', 2, 0, '2024-2-18 15:12:15', '1 自适应 2 居中', 1);
+INSERT INTO `customizer` (`id`, `name`, `code`, `zh_name`, `value`, `is_delete`, `update_date`, `remark`, `user_id`) VALUES ('6ba7b8109dad11d180b400c04fd430c2', 'Topbar Color', 2, '顶部颜色', 2, 0, '2024-2-18 15:14:16', '1 明亮 2 黑暗', 1);
+INSERT INTO `customizer` (`id`, `name`, `code`, `zh_name`, `value`, `is_delete`, `update_date`, `remark`, `user_id`) VALUES ('6ba7b8109dad11d180b400c04fd430c3', 'Sidebar Size', 3, '导航大小', 3, 0, '2024-2-18 15:15:27', '1 默认 2 紧凑 3 小巧', 1);
+INSERT INTO `customizer` (`id`, `name`, `code`, `zh_name`, `value`, `is_delete`, `update_date`, `remark`, `user_id`) VALUES ('6ba7b8109dad11d180b400c04fd430c4', 'Sidebar Color', 4, '导航颜色', 1, 0, '2024-2-18 15:16:21', '1 明亮 2 黑暗 3 经典', 1);
+INSERT INTO `customizer` (`id`, `name`, `code`, `zh_name`, `value`, `is_delete`, `update_date`, `remark`, `user_id`) VALUES ('6ba7b8109dad11d180b400c04fd430c5', 'Layout Mode', 5, '布局模式', 2, 0, '2024-2-19 22:58:06', '1 明亮 2 黑暗', 1);

@@ -1,0 +1,192 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>
+        {% block title %}
+
+        {% endblock %}
+    </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta content="Premium Multipurpose Admin & Dashboard Template" name="description">
+    <meta content="Themesbrand" name="author">
+    <link href="{% static 'picture/favicon.ico' %}" rel="icon">
+    <link rel="stylesheet" href="{% static 'css/alert.css' %}" type="text/css">
+    <!-- preloader css -->
+    <link rel="stylesheet" href="{% static 'css/preloader.min.css' %}" type="text/css">
+
+    <!-- Bootstrap Css -->
+    <link href="{% static 'css/bootstrap.min.css' %}" id="bootstrap-style" rel="stylesheet" type="text/css">
+    <!-- Icons Css -->
+    <link href="{% static 'css/icons.min.css' %}" rel="stylesheet" type="text/css">
+    <!-- App Css-->
+    <link href="{% static 'css/app.min.css' %}" id="app-style" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+
+<!-- <body data-layout="horizontal"> -->
+<div class="auth-page">
+    <div class="container-fluid p-0">
+        <div class="row g-0">
+            <div class="col-xxl-3 col-lg-4 col-md-5">
+                <div class="auth-full-page-content d-flex p-sm-5 p-4">
+                    <div class="w-100">
+                        <div class="d-flex flex-column h-100">
+                            <div class="mb-4 mb-md-5 text-center">
+                                <a href="javascript: void(0);" class="d-block auth-logo">
+                                    <img src="{% static 'picture/logo.png' %}" alt="" height="28"> <span
+                                        class="logo-txt">
+                                    {{ siteName }}
+                                </span>
+                                </a>
+                            </div>
+                            <div class="auth-content my-auto">
+                                <div class="text-center">
+                                    <h5 class="mb-0">
+                                        {% block welcome %}
+
+                                        {% endblock %}
+                                    </h5>
+                                    <p class="text-muted mt-2">
+                                        {% block welcomeText %}
+
+                                        {% endblock %}
+                                    </p>
+                                </div>
+                                {% block body %}
+
+                                {% endblock %}
+                            </div>
+                            <div class="mt-4 mt-md-5 text-center">
+                                <p class="mb-0">©
+                                    <script>document.write(new Date().getFullYear())</script>
+                                    Minia . Crafted with <i class="mdi mdi-heart text-danger"></i> by Bruce.li
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- end auth full page content -->
+            </div>
+            <!-- end col -->
+            <!--登录页动画-->
+            <div class="col-xxl-9 col-lg-8 col-md-7">
+                <div class="auth-bg pt-md-5 p-4 d-flex">
+                    <div class="bg-overlay bg-primary"></div>
+                    <ul class="bg-bubbles">
+                        <li></li>
+                        <li></li>
+                        <li></li>
+                        <li></li>
+                        <li></li>
+                        <li></li>
+                        <li></li>
+                        <li></li>
+                        <li></li>
+                        <li></li>
+                    </ul>
+                    <!-- end bubble effect -->
+                    <div class="row justify-content-center align-items-center" style="width: 100%;">
+                        <div class="col-xl-7">
+                            <div class="p-0 p-sm-4 px-xl-0">
+                                <div id="reviewcarouselIndicators" class="carousel slide" data-bs-ride="carousel">
+                                    <div class="carousel-indicators carousel-indicators-rounded justify-content-start ms-0 mb-0"
+                                         id="slide-btn">
+
+                                    </div>
+                                    <!-- end carouselIndicators -->
+                                    <div class="carousel-inner">
+
+                                    </div>
+                                    <!-- end carousel-inner -->
+                                </div>
+                                <!-- end review carousel -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- end col -->
+        </div>
+        <!-- end row -->
+    </div>
+    <!-- end container fluid -->
+</div>
+
+<!-- JAVASCRIPT -->
+<script src="{% static 'js/jquery.min.js' %}"></script>
+<script src="{% static 'js/alert.js' %}"></script>
+<script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'js/metisMenu.min.js' %}"></script>
+<script src="{% static 'js/simplebar.min.js' %}"></script>
+<script src="{% static 'js/waves.min.js' %}"></script>
+<script src="{% static 'js/feather.min.js' %}"></script>
+<!-- pace js -->
+<script src="{% static 'js/pace.min.js' %}"></script>
+<!-- password addon init -->
+<script src="{% static 'js/pass-addon.init.js' %}"></script>
+<script>
+    function Poetry() {
+        $.ajax({
+            type: "post",
+            url: "{% url 'nb:poetry' %}",
+            async: false,
+            success: function (result) {
+                console.log(`nb:poetry ==>> ${JSON.stringify(result)}`);
+                let message = result.message;
+                let code = result.code;
+                if (code === 200) {
+                    let data = result.data;
+                    let content = "";
+                    let btn = "";
+                    for (i = 0; i < data.length; i++) {
+                        if (i === 0) {
+                            content += `<div class="carousel-item active">`
+                            btn += `<button type="button" data-bs-target="#reviewcarouselIndicators"
+                                                data-bs-slide-to="${i}" class="active" aria-current="true"
+                                                aria-label="Slide ${i + 1}"></button>
+                                        `
+                        } else {
+                            content += `<div class="carousel-item">`
+                            btn += `<button type="button" data-bs-target="#reviewcarouselIndicators"
+                                                data-bs-slide-to="${i}" aria-label="Slide ${i + 1}"></button>`
+                        }
+                        content += `<div class="testi-contain text-white">
+                                                <i class="bx bxs-quote-alt-left text-success display-6"></i>
+
+                                                <h4 class="mt-4 fw-medium lh-base text-white">${data[i].phrase}</h4>
+                                                <p class="mt-4 fw-medium lh-base text-white">${data[i].explain}</p>
+                                                <div class="mt-4 pt-3 pb-5">
+                                                    <div class="d-flex align-items-start">
+
+                                                        <div class="flex-1 ms-3 mb-4">
+                                                            <h5 class="font-size-18 text-white">${data[i].poetry_name}</h5>
+                                                            <p class="mb-0 text-white-50">${data[i].dynasty}·${data[i].author}</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>`
+                    }
+                    $(".carousel-inner").append(content)
+                    $("#slide-btn").append(btn)
+                } else {
+                    removeAlert(prompt).html(message).addClass("alert-warning").show().delay(1500).fadeOut();
+                }
+            }, error: function () {
+                removeAlert(prompt).html("出现未知异常，请联系Bruce.Li").addClass('alert-danger').show().delay(1500).fadeOut();
+            }
+        })
+    }
+
+    Poetry();
+</script>
+{% block js %}
+
+{% endblock %}
+</body>
+
+</html>

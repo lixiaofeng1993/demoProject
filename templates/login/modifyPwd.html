@@ -1,0 +1,247 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    修改密码
+{% endblock %}
+
+{% block body %}
+    <!-- start page title -->
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0 font-size-18">修改密码</h4>
+                <div class="page-title-right">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item"><a href="{% url 'index' %}">首页</a></li>
+                        <li class="breadcrumb-item active">修改密码</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- end page title -->
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body p-4">
+                    <div class="row" style="margin-left: 25%;">
+                        <div class="col-lg-6">
+                            <div>
+                                <div class="mb-3">
+                                    <label for="example-text-input" class="form-label">登录帐号</label>
+                                    <input class="form-control" type="text" value="{{ user }}" id="name"
+                                           disabled>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="example-search-input" class="form-label">原密码</label>
+                                    <input class="form-control" type="password" value="" id="password">
+                                    <div class="invalid" id="password-error" style="position: absolute;"></div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="example-search-input" class="form-label">新密码</label>
+                                    <input class="form-control" type="password" value="" id="new-password"
+                                           placeholder="请输入新密码">
+                                    <div class="invalid" id="new-password-error" style="position: absolute;"></div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="example-search-input" class="form-label">确认密码</label>
+                                    <input class="form-control" type="password" value="" id="confirm-password"
+                                           placeholder="请输入确认密码">
+                                    <div class="invalid" id="confirm-password-error" style="position: absolute;"></div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="example-text-input" class="form-label">密保问题</label>
+                                    <input class="form-control" type="text" placeholder="请输入密保问题"
+                                           value="{% if obj %}{{ obj.problem }}{% endif %}" id="problem">
+                                    <div class="invalid" id="problem-error" style="position: absolute;"></div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="example-text-input" class="form-label">密保答案</label>
+                                    <input class="form-control" type="text" placeholder="请输入密保答案"
+                                           value="{% if obj %}{{ obj.answer }}{% endif %}" id="answer">
+                                    <div class="invalid" id="answer-error" style="position: absolute;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-wrap gap-2">
+                            <button type="button" class="btn btn-primary waves-effect waves-light" onclick="savePwd();">
+                                保存
+                            </button>
+                            <button type="reset" class="btn btn-secondary waves-effect waves-light"
+                                    onclick="location.reload();">
+                                重置
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div> <!-- end col -->
+    </div>
+    <!-- end row -->
+{% endblock %}
+
+{% block js %}
+    <script>
+        let passwordObj = document.getElementById("password"); // 获取输入框元素
+        let newPasswordObj = document.getElementById("new-password");
+        let confirmPasswordObj = document.getElementById("confirm-password");
+        let problemObj = document.getElementById("problem");
+        let answerObj = document.getElementById("answer");
+
+        function passwordVerify(value) {
+            let passwordError = $("#password-error");
+            if (value.length < 6) {
+                passwordError.html("密码不能小于6位");
+                return false;
+            } else {
+                passwordError.html("");
+                return true;
+            }
+        }
+
+        function newPasswordVerify(value) {
+            let newPasswordError = $("#new-password-error");
+            let password = $("#password").val();
+            if (value.length < 6) {
+                newPasswordError.html("新密码不能小于6位");
+                return false;
+            } else if (value === password) {
+                newPasswordError.html("新密码和原密码相同");
+                return false;
+            } else {
+                newPasswordError.html("");
+                return true;
+            }
+        }
+
+        function confirmPasswordVerify(value) {
+            let newPasswordError = $("#confirm-password-error");
+            let new_password = $("#new-password").val();
+            if (value.length < 6) {
+                newPasswordError.html("确认密码不能小于6位");
+                return false;
+            } else if (value !== new_password) {
+                newPasswordError.html("新密码和确认密码不一致");
+                return false;
+            } else {
+                newPasswordError.html("");
+                return true;
+            }
+        }
+
+        function problemVerify(value) {
+            let problemError = $("#problem-error");
+            if (value.length > 100) {
+                problemError.html("密保问题限制最多100个字符");
+                return false;
+            } else if (!value) {
+                problemError.html("密保问题不能为空");
+                return false;
+            } else {
+                problemError.html("");
+                return true;
+            }
+        }
+
+        function answerVerify(value) {
+            let answerError = $("#answer-error");
+            if (value.length > 50) {
+                answerError.html("密保答案限制最多50个字符");
+                return false;
+            } else if (!value) {
+                answerError.html("密保答案不能为空");
+                return false;
+            } else {
+                answerError.html("");
+                return true;
+            }
+        }
+
+        passwordObj.addEventListener('blur', function () { // 添加失去焦点事件处理程序
+            let value = this.value; // 获取输入框的值
+            passwordVerify(value);
+        });
+
+        newPasswordObj.addEventListener('blur', function () { // 添加失去焦点事件处理程序
+            let value = this.value; // 获取输入框的值
+            newPasswordVerify(value);
+        });
+
+        confirmPasswordObj.addEventListener('blur', function () { // 添加失去焦点事件处理程序
+            let value = this.value; // 获取输入框的值
+            confirmPasswordVerify(value);
+        });
+
+        passwordObj.addEventListener('blur', function () { // 添加失去焦点事件处理程序
+            let value = this.value; // 获取输入框的值
+            passwordVerify(value);
+        });
+
+        answerObj.addEventListener('blur', function () { // 添加失去焦点事件处理程序
+            let value = this.value; // 获取输入框的值
+            answerVerify(value);
+        });
+    </script>
+    <script>
+        function savePwd() {
+            let password = $("#password").val();
+            let newPassword = $("#new-password").val();
+            let confirmPassword = $("#confirm-password").val();
+            let problem = $("#problem").val();
+            let answer = $("#answer").val();
+            if (password && !passwordVerify(password)) {
+                return
+            } else if (newPassword && !newPasswordVerify(newPassword)) {
+                return
+            } else if (confirmPassword && !confirmPasswordVerify(confirmPassword)) {
+                return
+            } else if (!problemVerify(problem)) {
+                return
+            } else if (!answerVerify(answer)) {
+                return
+            }
+            let dataJson = JSON.stringify({
+                "password": password,
+                "newPassword": newPassword,
+                "confirmPassword": confirmPassword,
+                "problem": problem,
+                "answer": answer,
+            });
+            $.ajax({
+                type: "post",
+                url: `{% url 'modify_pwd' %}`,
+                headers: {
+                    "Authorization": token,
+                },
+                dataType: "json",
+                data: dataJson,
+                async: false,
+                success: function (result) {
+                    console.log("modify-pwd==>>", result);
+                    let code = result.code;
+                    let message = result.message;
+                    if (code === 200) {
+                        $("#staticBackdrop").modal("hide");
+                        setTimeout(function () {
+                            removeAlert(prompt).html("保存成功").addClass("alert-success").show().delay(1500).fadeOut();
+                            setTimeout(function () {
+                                top.location.href = `{% url 'modify_pwd' %}`;
+                            }, 1500);
+                        }, 500);
+                    } else if (code === 100000) {
+                        removeAlert(prompt).html(message).addClass("alert-warning").show().delay(1500).fadeOut();
+                        setTimeout(function () {
+                            top.location.href = "{% url 'login' %}";
+                        }, 1500);
+                    } else {
+                        removeAlert(prompt).html(message).addClass("alert-warning").show().delay(1500).fadeOut();
+                    }
+                },
+                error: function () {
+                    removeAlert(prompt).html("出现未知异常，请联系Bruce.Li").addClass('alert-danger').show().delay(1500).fadeOut();
+                }
+            })
+        }
+    </script>
+{% endblock %}
