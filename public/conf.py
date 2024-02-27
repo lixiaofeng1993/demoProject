@@ -70,6 +70,8 @@ DefaultPassword = "123456"
 NumberOfPages = 10
 # 首页展示数量
 HomeNumber = 5
+# 辅助数据展示数量
+auxiliaryNumber = 100
 # 验证码长度
 CodeNumber = 6
 # 邮箱密码

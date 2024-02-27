@@ -16,7 +16,6 @@
                         <li class="breadcrumb-item active">消息通知</li>
                     </ol>
                 </div>
-
             </div>
         </div>
     </div>
@@ -25,7 +24,17 @@
     <div class="row">
         <div class="col-xl-12">
             <div class="card">
+                <div class="card-header">
+                    <div class="pull-left">
 
+                    </div>
+                    <div class="pull-right">
+                        <button type="button" class="btn btn-info waves-effect waves-light"
+                                onclick="OpenPromptModal();">
+                            标记为已读
+                        </button>
+                    </div>
+                </div>
             </div>
             <!--页面数据-->
             <div class="card-body">
@@ -128,7 +137,7 @@
                 {% endif %}
             {% endif %}
             <li>
-                <select class="ui-select-pagesize" onchange="refreshSize();">
+                <select class="ui-select-pagesize" onchange="RefreshSize();">
                     {% if size == 5 %}
                         <option value="5" selected>5条/页</option>
                     {% else %}
@@ -153,15 +162,86 @@
             </li>
         </ul>
     {% endif %}
+
+    <!--确认弹窗-->
+    <div class="modal fade" id="exampleModalCenter-prompt" data-bs-backdrop="static" data-bs-keyboard="false"
+         tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
+            <div class="modal-content">
+                <div class="prompt-header">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="prompt-text">
+                    <span id="prompt-title"></span>
+                </div>
+                <div class="prompt-footer">
+                    <button type="button" class="btn btn-soft-success waves-effect waves-light" onclick="ConfirmBtn();"
+                            data-bs-dismiss="modal">确认
+                    </button>
+                    <button type="button" class="btn btn-soft-link waves-effect" data-bs-dismiss="modal"
+                            style="margin-left: 15%;">取消
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--异常提示弹窗-->
+    <div role="alert" id="alert"></div>
 {% endblock %}
 
 {% block js %}
     <script>
-        function refreshSize() {
+        function RefreshSize() {
             let size = $(".ui-select-pagesize").val();
             setTimeout(function () {
-                top.location.href = `{% url 'nb:message_warn' %}?page=1&size=${size}`;
+                top.location.href = `{% url 'nb:message_list' %}?page=1&size=${size}`;
             }, 500);
+        }
+
+        function OpenPromptModal() {
+            $("#exampleModalCenter-prompt").modal("show");
+            let title = $("#prompt-title");
+            title.html("确认要将所有通知标记为【已读】吗？");
+        }
+
+        function ConfirmBtn() {
+            setTimeout(function () {
+                MessageLook();
+            }, 500);
+        }
+
+        function MessageLook() {
+            $.ajax({
+                type: "post",
+                url: `{% url 'nb:message_look' %}?page={{ page }}&size={{ size }}&search={{ search }}`,
+                headers: {
+                    "Authorization": token,
+                },
+                async: false,
+                success: function (result) {
+                    console.log("message-look==>>", result);
+                    let code = result.code;
+                    let message = result.message;
+                    let data = result.data;
+                    if (code === 200) {
+                        removeAlert(prompt).html("标记已读成功").addClass("alert-success").show().delay(1500).fadeOut();
+                        setTimeout(function () {
+                            top.location.href = `{% url 'nb:message_list' %}?page=${data.page}&size={{ size }}`;
+                        }, 1500);
+                    } else if (code === 100009) {
+                        removeAlert(prompt).html("暂无未读通知").addClass("alert-warning").show().delay(1500).fadeOut();
+                    } else if (code === 100000) {
+                        removeAlert(prompt).html(message).addClass("alert-warning").show().delay(1500).fadeOut();
+                        setTimeout(function () {
+                            top.location.href = "{% url 'login' %}";
+                        }, 1500);
+                    } else {
+                        removeAlert(prompt).html(message).addClass("alert-warning").show().delay(1500).fadeOut();
+                    }
+                }, error: function () {
+                    removeAlert(prompt).html("出现未知异常，请联系Bruce.Li").addClass('alert-danger').show().delay(1500).fadeOut();
+                }
+            })
         }
     </script>
 {% endblock %}

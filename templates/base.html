@@ -71,7 +71,7 @@
                 <div class="">
                     <button type="button" class="btn header-item" id="mode-setting-btn"
                             style="font-size: 130%;margin-top: 5%"
-                            onclick="modifySubject(5, this.value);">
+                            onclick="ModifySubject(5, this.value);">
 
                     </button>
                 </div>
@@ -131,7 +131,8 @@
                                     <h6 class="m-0"> 通知 </h6>
                                 </div>
                                 <div class="col-auto">
-                                    {#                                    <a href="#!" class="small text-reset text-decoration-underline"> Unread (3)</a>#}
+                                    <a href="" class="small text-reset text-decoration-underline"
+                                       id="unread-number"></a>
                                 </div>
                             </div>
                         </div>
@@ -139,7 +140,7 @@
 
                         </div>
                         <div class="p-2 border-top d-grid">
-                            <a class="btn btn-sm btn-link font-size-14 text-center" href="{% url 'nb:message_warn' %}">
+                            <a class="btn btn-sm btn-link font-size-14 text-center" href="{% url 'nb:message_list' %}">
                                 <i class="mdi mdi-arrow-right-circle me-1"></i> <span>查看更多</span>
                             </a>
                         </div>
@@ -193,7 +194,7 @@
                     </li>
                     <li>
                         <a href="{% url 'nb:operate_log' %}">
-                            <i class="bx bx-video-recording"></i>
+                            <i data-feather="video"></i>
                             <span data-key="t-goods">操作日志</span>
                         </a>
                     </li>
@@ -307,7 +308,7 @@
         loadingAnimation.style.display = "none";
     });
 
-    function modifySubject(code, value) {
+    function ModifySubject(code, value) {
         if (code === 5) {
             let layoutIcon = $("#mode-setting-btn");
             layoutIcon.html("");
@@ -324,13 +325,13 @@
             type: "post",
             url: `{% url 'nb:modify_subject' %}`,
             headers: {
-                "Authorization": token
+                "Authorization": token,
             },
             dataType: "json",
             data: dataJson,
             async: false,
             success: function (result) {
-                console.log("modify_subject==>>", result);
+                console.log("modify-subject==>>", result);
                 let code = result.code;
                 let message = result.message;
                 if (code === 200) {
@@ -371,21 +372,21 @@
                             if (data[i].fields.value === 1) {
                                 document.body.setAttribute('data-layout-size', 'fluid');
                                 content += `<div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="radio" name="layout-width" id="layout-width-fuild" value="fuild" onchange="modifySubject(1, 1)" checked>
+                                            <input class="form-check-input" type="radio" name="layout-width" id="layout-width-fuild" value="fuild" onchange="ModifySubject(1, 1)" checked>
                                             <label class="form-check-label" for="layout-width-fuild">自适应</label>
                                         </div>
                                            <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="radio" name="layout-width" id="layout-width-boxed" value="boxed" onchange="modifySubject(1, 2)">
+                                            <input class="form-check-input" type="radio" name="layout-width" id="layout-width-boxed" value="boxed" onchange="ModifySubject(1, 2)">
                                             <label class="form-check-label" for="layout-width-boxed">居中</label>
                                         </div>`
                             } else if (data[i].fields.value === 2) {
                                 document.body.setAttribute('data-layout-size', 'boxed');
                                 content += `<div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="radio" name="layout-width" id="layout-width-fuild" value="fuild"  onchange="modifySubject(1, 1)">
+                                            <input class="form-check-input" type="radio" name="layout-width" id="layout-width-fuild" value="fuild"  onchange="ModifySubject(1, 1)">
                                             <label class="form-check-label" for="layout-width-fuild">自适应</label>
                                         </div>
                                         <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="radio" name="layout-width" id="layout-width-boxed" value="boxed" onchange="modifySubject(1, 2)" checked>
+                                            <input class="form-check-input" type="radio" name="layout-width" id="layout-width-boxed" value="boxed" onchange="ModifySubject(1, 2)" checked>
                                             <label class="form-check-label" for="layout-width-boxed">居中</label>
                                         </div>`
                             }
@@ -397,11 +398,11 @@
                                 }
                                 content += `
                                         <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="radio" name="topbar-color" id="topbar-color-light" value="light" onchange="modifySubject(2, 1)" checked>
+                                            <input class="form-check-input" type="radio" name="topbar-color" id="topbar-color-light" value="light" onchange="ModifySubject(2, 1)" checked>
                                             <label class="form-check-label" for="topbar-color-light">明亮</label>
                                         </div>
                                         <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="radio" name="topbar-color" id="topbar-color-dark" value="dark" onchange="modifySubject(2, 2)">
+                                            <input class="form-check-input" type="radio" name="topbar-color" id="topbar-color-dark" value="dark" onchange="ModifySubject(2, 2)">
                                             <label class="form-check-label" for="topbar-color-dark">黑暗</label>
                                         </div>`
                             } else if (data[i].fields.value === 2) {
@@ -410,11 +411,11 @@
                                 }
                                 content += `
                                         <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="radio" name="topbar-color" id="topbar-color-light" value="light" onchange="modifySubject(2, 1)">
+                                            <input class="form-check-input" type="radio" name="topbar-color" id="topbar-color-light" value="light" onchange="ModifySubject(2, 1)">
                                             <label class="form-check-label" for="topbar-color-light">明亮</label>
                                         </div>
                                         <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="radio" name="topbar-color" id="topbar-color-dark" value="dark" onchange="modifySubject(2, 2)" checked>
+                                            <input class="form-check-input" type="radio" name="topbar-color" id="topbar-color-dark" value="dark" onchange="ModifySubject(2, 2)" checked>
                                             <label class="form-check-label" for="topbar-color-dark">黑暗</label>
                                         </div>`
                             }
@@ -423,43 +424,43 @@
                             if (data[i].fields.value === 1) {
                                 document.body.setAttribute('data-sidebar-size', 'lg')
                                 content += `<div class="form-check sidebar-setting">
-                                            <input class="form-check-input" type="radio" name="sidebar-size" id="sidebar-size-default" value="default" onchange="modifySubject(3, 1)" checked>
+                                            <input class="form-check-input" type="radio" name="sidebar-size" id="sidebar-size-default" value="default" onchange="ModifySubject(3, 1)" checked>
                                             <label class="form-check-label" for="sidebar-size-default">默认</label>
                                         </div>
                                         <div class="form-check sidebar-setting">
-                                            <input class="form-check-input" type="radio" name="sidebar-size" id="sidebar-size-compact" value="compact" onchange="modifySubject(3, 2)">
+                                            <input class="form-check-input" type="radio" name="sidebar-size" id="sidebar-size-compact" value="compact" onchange="ModifySubject(3, 2)">
                                             <label class="form-check-label" for="sidebar-size-compact">紧凑</label>
                                         </div>
                                         <div class="form-check sidebar-setting">
-                                            <input class="form-check-input" type="radio" name="sidebar-size" id="sidebar-size-small" value="small" onchange="modifySubject(3, 3)">
+                                            <input class="form-check-input" type="radio" name="sidebar-size" id="sidebar-size-small" value="small" onchange="ModifySubject(3, 3)">
                                             <label class="form-check-label" for="sidebar-size-small">小巧</label>
                                         </div>`
                             } else if (data[i].fields.value === 2) {
                                 document.body.setAttribute('data-sidebar-size', 'md');
                                 content += `<div class="form-check sidebar-setting">
-                                            <input class="form-check-input" type="radio" name="sidebar-size" id="sidebar-size-default" value="default" onchange="modifySubject(3, 1)">
+                                            <input class="form-check-input" type="radio" name="sidebar-size" id="sidebar-size-default" value="default" onchange="ModifySubject(3, 1)">
                                             <label class="form-check-label" for="sidebar-size-default">默认</label>
                                         </div>
                                         <div class="form-check sidebar-setting">
-                                            <input class="form-check-input" type="radio" name="sidebar-size" id="sidebar-size-compact" value="compact" onchange="modifySubject(3, 2)" checked>
+                                            <input class="form-check-input" type="radio" name="sidebar-size" id="sidebar-size-compact" value="compact" onchange="ModifySubject(3, 2)" checked>
                                             <label class="form-check-label" for="sidebar-size-compact">紧凑</label>
                                         </div>
                                         <div class="form-check sidebar-setting">
-                                            <input class="form-check-input" type="radio" name="sidebar-size" id="sidebar-size-small" value="small" onchange="modifySubject(3, 3)">
+                                            <input class="form-check-input" type="radio" name="sidebar-size" id="sidebar-size-small" value="small" onchange="ModifySubject(3, 3)">
                                             <label class="form-check-label" for="sidebar-size-small">小巧</label>
                                         </div>`
                             } else if (data[i].fields.value === 3) {
                                 document.body.setAttribute('data-sidebar-size', 'sm');
                                 content += `<div class="form-check sidebar-setting">
-                                            <input class="form-check-input" type="radio" name="sidebar-size" id="sidebar-size-default" value="default" onchange="modifySubject(3, 1)">
+                                            <input class="form-check-input" type="radio" name="sidebar-size" id="sidebar-size-default" value="default" onchange="ModifySubject(3, 1)">
                                             <label class="form-check-label" for="sidebar-size-default">默认</label>
                                         </div>
                                         <div class="form-check sidebar-setting">
-                                            <input class="form-check-input" type="radio" name="sidebar-size" id="sidebar-size-compact" value="compact" onchange="modifySubject(3, 2)">
+                                            <input class="form-check-input" type="radio" name="sidebar-size" id="sidebar-size-compact" value="compact" onchange="ModifySubject(3, 2)">
                                             <label class="form-check-label" for="sidebar-size-compact">紧凑</label>
                                         </div>
                                         <div class="form-check sidebar-setting">
-                                            <input class="form-check-input" type="radio" name="sidebar-size" id="sidebar-size-small" value="small" onchange="modifySubject(3, 3)" checked>
+                                            <input class="form-check-input" type="radio" name="sidebar-size" id="sidebar-size-small" value="small" onchange="ModifySubject(3, 3)" checked>
                                             <label class="form-check-label" for="sidebar-size-small">小巧</label>
                                         </div>`
                             }
@@ -470,15 +471,15 @@
                                     document.body.setAttribute('data-sidebar', 'light');
                                 }
                                 content += `<div class="form-check sidebar-setting">
-                                            <input class="form-check-input" type="radio" name="sidebar-color" id="sidebar-color-light" value="light" onchange="modifySubject(4, 1)" checked>
+                                            <input class="form-check-input" type="radio" name="sidebar-color" id="sidebar-color-light" value="light" onchange="ModifySubject(4, 1)" checked>
                                             <label class="form-check-label" for="sidebar-color-light">明亮</label>
                                         </div>
                                         <div class="form-check sidebar-setting">
-                                            <input class="form-check-input" type="radio" name="sidebar-color" id="sidebar-color-dark" value="dark" onchange="modifySubject(4, 2)">
+                                            <input class="form-check-input" type="radio" name="sidebar-color" id="sidebar-color-dark" value="dark" onchange="ModifySubject(4, 2)">
                                             <label class="form-check-label" for="sidebar-color-dark">黑暗</label>
                                         </div>
                                         <div class="form-check sidebar-setting">
-                                            <input class="form-check-input" type="radio" name="sidebar-color" id="sidebar-color-brand" value="brand" onchange="modifySubject(4, 3)">
+                                            <input class="form-check-input" type="radio" name="sidebar-color" id="sidebar-color-brand" value="brand" onchange="ModifySubject(4, 3)">
                                             <label class="form-check-label" for="sidebar-color-brand">经典</label>
                                         </div>`
                             } else if (data[i].fields.value === 2) {
@@ -486,15 +487,15 @@
                                     document.body.setAttribute('data-sidebar', 'dark');
                                 }
                                 content += `<div class="form-check sidebar-setting">
-                                            <input class="form-check-input" type="radio" name="sidebar-color" id="sidebar-color-light" value="light" onchange="modifySubject(4, 1)">
+                                            <input class="form-check-input" type="radio" name="sidebar-color" id="sidebar-color-light" value="light" onchange="ModifySubject(4, 1)">
                                             <label class="form-check-label" for="sidebar-color-light">明亮</label>
                                         </div>
                                         <div class="form-check sidebar-setting">
-                                            <input class="form-check-input" type="radio" name="sidebar-color" id="sidebar-color-dark" value="dark" onchange="modifySubject(4, 2)" checked>
+                                            <input class="form-check-input" type="radio" name="sidebar-color" id="sidebar-color-dark" value="dark" onchange="ModifySubject(4, 2)" checked>
                                             <label class="form-check-label" for="sidebar-color-dark">黑暗</label>
                                         </div>
                                         <div class="form-check sidebar-setting">
-                                            <input class="form-check-input" type="radio" name="sidebar-color" id="sidebar-color-brand" value="brand" onchange="modifySubject(4, 3)">
+                                            <input class="form-check-input" type="radio" name="sidebar-color" id="sidebar-color-brand" value="brand" onchange="ModifySubject(4, 3)">
                                             <label class="form-check-label" for="sidebar-color-brand">经典</label>
                                         </div>`
                             } else if (data[i].fields.value === 3) {
@@ -502,15 +503,15 @@
                                     document.body.setAttribute('data-sidebar', 'brand');
                                 }
                                 content += `<div class="form-check sidebar-setting">
-                                            <input class="form-check-input" type="radio" name="sidebar-color" id="sidebar-color-light" value="light" onchange="modifySubject(4, 1)">
+                                            <input class="form-check-input" type="radio" name="sidebar-color" id="sidebar-color-light" value="light" onchange="ModifySubject(4, 1)">
                                             <label class="form-check-label" for="sidebar-color-light">明亮</label>
                                         </div>
                                         <div class="form-check sidebar-setting">
-                                            <input class="form-check-input" type="radio" name="sidebar-color" id="sidebar-color-dark" value="dark" onchange="modifySubject(4, 2)">
+                                            <input class="form-check-input" type="radio" name="sidebar-color" id="sidebar-color-dark" value="dark" onchange="ModifySubject(4, 2)">
                                             <label class="form-check-label" for="sidebar-color-dark">黑暗</label>
                                         </div>
                                         <div class="form-check sidebar-setting">
-                                            <input class="form-check-input" type="radio" name="sidebar-color" id="sidebar-color-brand" value="brand" onchange="modifySubject(4, 3)" checked>
+                                            <input class="form-check-input" type="radio" name="sidebar-color" id="sidebar-color-brand" value="brand" onchange="ModifySubject(4, 3)" checked>
                                             <label class="form-check-label" for="sidebar-color-brand">经典</label>
                                         </div>`
                             }
@@ -574,7 +575,7 @@
         })
     }
 
-    function MessageWarn() {
+    function MessageHome() {
         $.ajax({
             type: "post",
             url: `{% url 'nb:message_home' %}`,
@@ -583,7 +584,7 @@
             },
             async: false,
             success: function (result) {
-                console.log("message-warn==>>", result);
+                console.log("message-home==>>", result);
                 let code = result.code;
                 let message = result.message;
                 if (code === 200) {
@@ -591,25 +592,35 @@
                     let data = result.data;
                     let number = data.number;
                     let flag = data.flag;
-                    for (i = 0; i < data.data.length; i++) {
+                    if (number === 0) {
                         content += `<a href="" class="text-reset notification-item">
                                 <div class="d-flex">
-                                    <div class="flex-grow-1">
-                                        <h6 class="mb-1">${data.data[i].name}</h6>
-                                        <div class="font-size-13 text-muted">
-                                            <p class="mb-0"><i class="mdi mdi-clock-outline"></i>
-                                                <span>${data.data[i].time}</span>
-                                            </p>
-                                        </div>
+                                    <div class="flex-grow-1" style="text-align: center;">
+                                        <p>暂无通知提醒</p>
                                     </div>
                                 </div>
                             </a>`
-                    }
-                    if (number > 99) {
-                        number = 99;
+                    } else {
+                        for (i = 0; i < data.data.length; i++) {
+                            content += `<a href="" class="text-reset notification-item">
+                                    <div class="d-flex">
+                                        <div class="flex-grow-1">
+                                            <h6 class="mb-1">${data.data[i].name}</h6>
+                                            <div class="font-size-13 text-muted">
+                                                <p class="mb-0"><i class="mdi mdi-clock-outline"></i>
+                                                    <span>${data.data[i].time}</span>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </a>`
+                        }
                     }
                     if (flag) {
                         $("#message-number").text(number);
+                        let unreadObj = $("#unread-number");
+                        unreadObj.text(` 未读 (${number})`);
+                        unreadObj.attr("href", `{% url 'nb:message_list' %}?search=is_look`)
                     }
                     $("#message-div").append(content);
                 } else if (code === 100000) {
@@ -629,7 +640,7 @@
 
     Theme();
     Subject();
-    MessageWarn();
+    MessageHome();
 </script>
 {% block js %}
 

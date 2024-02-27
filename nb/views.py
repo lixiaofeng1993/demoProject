@@ -101,11 +101,15 @@ def poetry(request):
 
 
 @login_required
-def message_warn(request):
+def message_list(request):
     """消息提醒页面"""
     if request.method == GET:
         info = request_get_search(request)
-        obj_list = query_model(request, Message).order_by("-create_date")
+        search = info["search"]
+        if search:
+            obj_list = query_model(request, Message).filter(is_look=False).order_by("-create_date")[0:auxiliaryNumber]
+        else:
+            obj_list = query_model(request, Message).order_by("-create_date")[0:auxiliaryNumber]
         info = pagination(paging_data(obj_list, info))
         return render(request, "home/message.html", info)
 
@@ -135,6 +139,22 @@ def message_home(request):
                 "type": message.type,
             })
         return JsonResponse.OK(data=result)
+
+
+@auth_token()
+def message_look(request):
+    """全部通知标记为已读"""
+    if request.method == POST:
+        model = query_model(request, Message).filter(is_look=False)
+        if model.exists():
+            model.update(is_look=True)
+        else:
+            return JsonResponse.EmptyException()
+        info = request_get_search(request)
+        message = query_model(request, Message).first()
+        setattr(message, "name", "未读通知标记为已读")
+        operation_record(request, model=message, action_flag=9)
+        return JsonResponse.OK(data=info)
 
 
 @login_required
@@ -263,9 +283,9 @@ def operate_log_list(request):
         info = request_get_search(request)
         search = info["search"]
         if search and search != "0":
-            obj_list = LogEntry.objects.filter(action_flag=search).order_by("-action_time")
+            obj_list = LogEntry.objects.filter(action_flag=search).order_by("-action_time")[0:auxiliaryNumber]
         else:
-            obj_list = LogEntry.objects.all().order_by("-action_time")
+            obj_list = LogEntry.objects.all().order_by("-action_time")[0:auxiliaryNumber]
         info = pagination(paging_data(obj_list, info))
         return render(request, "home/operateLog.html", info)
 

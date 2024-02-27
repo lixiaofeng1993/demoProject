@@ -16,7 +16,6 @@
                         <li class="breadcrumb-item active">操作日志</li>
                     </ol>
                 </div>
-
             </div>
         </div>
     </div>
@@ -166,7 +165,7 @@
                 {% endif %}
             {% endif %}
             <li>
-                <select class="ui-select-pagesize" onchange="refreshSize();">
+                <select class="ui-select-pagesize" onchange="RefreshSize();">
                     {% if size == 5 %}
                         <option value="5" selected>5条/页</option>
                     {% else %}
@@ -195,14 +194,14 @@
 
 {% block js %}
     <script>
-        function refreshSize() {
+        function RefreshSize() {
             let size = $(".ui-select-pagesize").val();
             setTimeout(function () {
                 top.location.href = `{% url 'nb:operate_log' %}?page=1&size=${size}&search={{ search }}`;
             }, 500);
         }
 
-        function string_format(string) {
+        function StringFormat(string) {
             string = string.replace("+", "%2B");
             // string = string.replace(" ", "%20");
             // string = string.replace("/", "%2F");
@@ -216,7 +215,7 @@
 
         function QueryPartners() {
             let search = $("#query_name").select().val();
-            search = string_format(search);
+            search = StringFormat(search);
             removeAlert(prompt).html("查询成功").addClass("alert-success").show().delay(1500).fadeOut();
             setTimeout(function () {
                 top.location.href = `{% url 'nb:operate_log' %}?page={{ page }}&size={{ size }}&search=${search}`;

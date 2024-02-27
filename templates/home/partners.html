@@ -29,7 +29,7 @@
                     <div class="pull-left">
                         <!--新增-->
                         <button type="button" class="btn btn-soft-primary waves-effect waves-light"
-                                onclick="openModal();">新增
+                                onclick="OpenModal();">新增
                         </button>
                     </div>
                     <div class="pull-right">
@@ -38,7 +38,7 @@
                             <div class="position-relative">
                                 <input type="text" class="form-control" placeholder="Search..." name="query_name"
                                        value="{{ search }}" id="query_name">
-                                <button class="btn btn-primary" type="button" onclick="query_partners();"
+                                <button class="btn btn-primary" type="button" onclick="QueryPartners();"
                                         id="search-btn">
                                     <i class="bx bx-search-alt align-middle"></i>
                                 </button>
@@ -85,12 +85,12 @@
                                         <td>{{ object.telephone|default:"--" }}</td>
                                         <td>{{ object.address|default:"--" }}</td>
                                         {% if object.status %}
-                                            <td onclick="openPromptModal('{{ object.id }}', 2,{{ object.status }});"
+                                            <td onclick="OpenPromptModal('{{ object.id }}', 2,{{ object.status }});"
                                                 style="color: #ffbf53;">
                                                 禁用
                                             </td>
                                         {% else %}
-                                            <td onclick="openPromptModal('{{ object.id }}', 2,{{ object.status }});"
+                                            <td onclick="OpenPromptModal('{{ object.id }}', 2,{{ object.status }});"
                                                 style="color: #2ab57d;">
                                                 正常
                                             </td>
@@ -103,7 +103,7 @@
                                                 编辑
                                             </button>
                                             <button type="button" class="btn btn-soft-danger waves-effect waves-light"
-                                                    onclick="openPromptModal('{{ object.id }}', 1);">
+                                                    onclick="OpenPromptModal('{{ object.id }}', 1);">
                                                 删除
                                             </button>
                                         </td>
@@ -180,7 +180,7 @@
                 {% endif %}
             {% endif %}
             <li>
-                <select class="ui-select-pagesize" onchange="refreshSize();">
+                <select class="ui-select-pagesize" onchange="RefreshSize();">
                     {% if size == 5 %}
                         <option value="5" selected>5条/页</option>
                     {% else %}
@@ -278,7 +278,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-light" data-bs-dismiss="modal">关闭</button>
-                    <button type="button" class="btn btn-primary" onclick="savePartners();" id="save-btn">
+                    <button type="button" class="btn btn-primary" onclick="SavePartners();" id="save-btn">
                         保存
                     </button>
                 </div>
@@ -397,14 +397,14 @@
             }
         });
 
-        function refreshSize() {
+        function RefreshSize() {
             let size = $(".ui-select-pagesize").val();
             setTimeout(function () {
                 top.location.href = `{% url 'nb:partners' %}?page=1&size=${size}&search={{ search }}`;
             }, 500);
         }
 
-        function string_format(string) {
+        function Stringformat(string) {
             string = string.replace("+", "%2B");
             // string = string.replace(" ", "%20");
             // string = string.replace("/", "%2F");
@@ -416,16 +416,16 @@
             return string;
         }
 
-        function query_partners() {
+        function QueryPartners() {
             let search = query_name_obj.val();
-            search = string_format(search);
+            search = Stringformat(search);
             removeAlert(prompt).html("查询成功").addClass("alert-success").show().delay(1500).fadeOut();
             setTimeout(function () {
                 top.location.href = `{% url 'nb:partners' %}?page={{ page }}&size={{ size }}&search=${search}`;
             }, 1500);
         }
 
-        function openModal() {
+        function OpenModal() {
             $("#staticBackdrop").modal("show");
             $("#staticBackdropLabel").html("业务伙伴");
             $("#partners-name").val(null);
@@ -438,7 +438,7 @@
             $("input[name='object-make']").val(null);
         }
 
-        function openPromptModal(object_id, flag, make = false) {
+        function OpenPromptModal(object_id, flag, make = false) {
             $("#exampleModalCenter-prompt").modal("show");
             let title = $("#prompt-title");
             $("input[name='object-id']").val(object_id);
@@ -458,14 +458,14 @@
                 let object_make = $("input[name='object-make']").val();
                 object_type = parseInt(object_type); // 转int
                 if (object_type === 1) {
-                    partners_del(object_id);
+                    PartnersDel(object_id);
                 } else if (object_type === 2) {
-                    partners_status(object_id, object_make);
+                    PartnersStatus(object_id, object_make);
                 }
             }, 500);
         }
 
-        function partners_status(partners_id, object_make) {
+        function PartnersStatus(partners_id, object_make) {
             let dataJson = JSON.stringify({
                 "status": object_make,
             });
@@ -502,7 +502,7 @@
             })
         }
 
-        function partners_del(partners_id) {
+        function PartnersDel(partners_id) {
             $.ajax({
                 type: "post",
                 url: `/nb/partners/del/${partners_id}/?page={{ page }}&size={{ size }}&search={{ search }}`,
@@ -534,7 +534,7 @@
             })
         }
 
-        function savePartners() {
+        function SavePartners() {
             let name = $("#partners-name").val();
             let type = $("#partners-type").select().val();
             let telephone = $("#partners-telephone").val();
